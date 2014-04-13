@@ -3,6 +3,7 @@
 *.so
 *.gwt-log
 *~
+*.jar
 .metadata/*
 .DS_Store
 Thumbs.db
