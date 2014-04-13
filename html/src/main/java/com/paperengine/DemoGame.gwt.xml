@@ -1,6 +1,8 @@
 <module rename-to='engine'>
   <inherits name='playn.PlayN'/>
   <inherits name='DemoGameAssets'/>
+  <inherits name="tripleplay.TriplePlay"/>
+  <inherits name="org.jbox2d.JBox2D" />
 
   <source path='core'/>
   <source path='html'/>

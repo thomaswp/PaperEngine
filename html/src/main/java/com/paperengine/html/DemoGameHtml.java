@@ -4,7 +4,7 @@ import playn.core.PlayN;
 import playn.html.HtmlGame;
 import playn.html.HtmlPlatform;
 
-import com.paperengine.core.DemoGame;
+import com.paperengine.core.PaperGame;
 
 public class DemoGameHtml extends HtmlGame {
 
@@ -14,6 +14,6 @@ public class DemoGameHtml extends HtmlGame {
     // use config to customize the HTML platform, if needed
     HtmlPlatform platform = HtmlPlatform.register(config);
     platform.assets().setPathPrefix("engine/");
-    PlayN.run(new DemoGame());
+    PlayN.run(new PaperGame());
   }
 }
