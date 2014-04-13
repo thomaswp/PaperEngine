@@ -1,0 +1,11 @@
+<module rename-to='engine'>
+  <inherits name='playn.PlayN'/>
+  <inherits name='DemoGameAssets'/>
+
+  <source path='core'/>
+  <source path='html'/>
+
+  <public path="resources" />
+
+  <entry-point class='com.paperengine.html.DemoGameHtml'/>
+</module>
