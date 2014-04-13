@@ -2,6 +2,7 @@ package com.paperengine.editor;
 
 import playn.core.Game;
 import playn.core.PlayN;
+import playn.java.JavaGraphics;
 import playn.java.JavaPlatform;
 
 public class JavaEditorPlatform extends JavaPlatform {
@@ -13,6 +14,9 @@ public class JavaEditorPlatform extends JavaPlatform {
 	public static JavaPlatform register() {
 		return register(new Config());
 	}
+	
+	boolean resize;
+	int width, height;
 
 	/**
 	 * Registers the Java platform with the specified configuration.
@@ -31,12 +35,27 @@ public class JavaEditorPlatform extends JavaPlatform {
 		PlayN.setPlatform(instance);
 		return instance;
 	}
+
+	public void setSize(int width, int height) {
+		this.width = width;
+		this.height = height;
+		resize = true;
+	}
 	
 	@Override
-	public void run(Game game) {
-		super.run(game);
+	protected JavaGraphics createGraphics(Config config) {
+		return new JavaEditorGraphics(this, config);
 	}
-
+	
+	@Override
+	protected void processFrame(Game game) {
+		if (resize) {
+			((JavaEditorGraphics) graphics()).resize(width, height);
+			resize = false;
+		}
+		super.processFrame(game);
+	}
+	
 	private static JavaEditorPlatform testInstance;
 
 }

@@ -22,6 +22,7 @@ public class MainWindow extends Frame implements WindowListener {
 
 	final Canvas canvas;
 	final JavaEditorPlatform platform;
+	final Thread gameThread;
 	
 	final Dimension GAME_SIZE = new Dimension(800, 600);
 
@@ -53,8 +54,6 @@ public class MainWindow extends Frame implements WindowListener {
 			});
 		}
 		
-		System.out.println(canvas.getWidth());
-
 		JavaPlatform.Config config = new JavaPlatform.Config();
 		config.width = canvas.getWidth();
 		config.height = canvas.getHeight();
@@ -68,7 +67,14 @@ public class MainWindow extends Frame implements WindowListener {
 		}
 		
 		canvas.paint(getGraphics());
-		platform.run(new PaperGame());
+		
+		gameThread = new Thread(new Runnable() {
+			@Override
+			public void run() {
+				platform.run(new PaperGame());
+			}
+		});
+		gameThread.start();
 	}
 
 	@Override
