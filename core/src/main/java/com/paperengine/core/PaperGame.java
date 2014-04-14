@@ -43,7 +43,8 @@ public class PaperGame extends Game.Default {
 	public void update(int delta) {
 		clock.update(delta);
 		if (scene != null) {
-			scene.update(delta);
+			if (Editor.editing) scene.updateEditor(delta); 
+			else scene.update(delta);
 		}
 	}
 
@@ -51,7 +52,8 @@ public class PaperGame extends Game.Default {
 	public void paint(float alpha) {
 		clock.paint(alpha);
 		if (scene != null) {
-			scene.paint(clock);
+			if (Editor.editing) scene.paintEditor(clock);
+			else scene.paint(clock);
 		}
 	}
 }

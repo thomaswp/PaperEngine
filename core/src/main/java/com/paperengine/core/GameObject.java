@@ -12,7 +12,7 @@ import pythagoras.f.Point;
 import com.paperengine.core.camera.Camera;
 import com.paperengine.core.render.Renderer;
 
-public class GameObject {
+public class GameObject implements IUpdatable {
 	
 	private List<Component> components = new ArrayList<Component>();
 	private boolean enabled = true;
@@ -85,6 +85,7 @@ public class GameObject {
 	public void addComponent(Component component) {
 		if (component == null) return;
 		this.components.add(component);
+		component.gameObject = this;
 		if (component instanceof Renderer) {
 			setRenderer((Renderer) component);
 		} else if (component instanceof Camera) {
@@ -132,11 +133,30 @@ public class GameObject {
 		for (Component component : components) {
 			component.paint(clock);
 		}
-		
+		updateTransform();
+	}
+
+	@Override
+	public void updateEditor(float delta) {
+		for (Component component : components) {
+			component.updateEditor(delta);
+		}
+	}
+
+	@Override
+	public void paintEditor(Clock clock) {
+		for (Component component : components) {
+			component.paintEditor(clock);
+		}
+		updateTransform();
+	}
+	
+	private void updateTransform() {
 		Point position = transform.position;
 		layer.setTranslation(position.x, position.y);
 		layer.setRotation(transform.rotation);
 		layer.setScaleX(transform.scaleX);
 		layer.setScaleY(transform.scaleY);
+		
 	}
 }

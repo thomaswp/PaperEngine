@@ -8,7 +8,6 @@ import java.awt.event.ComponentEvent;
 import org.lwjgl.LWJGLException;
 import org.lwjgl.opengl.Display;
 
-import playn.core.Game;
 import playn.java.JavaPlatform;
 
 import com.paperengine.core.PaperGame;
@@ -18,15 +17,15 @@ import com.paperengine.editor.game.TestScene;
 public class GameCanvas extends Canvas {
 	private static final long serialVersionUID = 1L;
 	
-	private Game game;
+	private PaperGame game;
 	private JavaEditorPlatform platform;
 	private Thread gameThread;
 	
-	public void setGame(Game game) {
+	public void setGame(PaperGame game) {
 		this.game = game;
 	}
 	
-	public Game game() {
+	public PaperGame game() {
 		return game;
 	}
 	
@@ -52,7 +51,6 @@ public class GameCanvas extends Canvas {
 	}
 	
 	public void init() {
-		if (game == null) return;
 		
 		JavaPlatform.Config config = new JavaPlatform.Config();
 		config.width = 800; //getWidth();
@@ -66,7 +64,7 @@ public class GameCanvas extends Canvas {
 			e.printStackTrace();
 		}
 		
-		final PaperGame game = new PaperGame();
+		game = new PaperGame();
 		game.setInitCallback(new Runnable() {
 			@Override
 			public void run() {

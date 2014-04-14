@@ -3,7 +3,6 @@ package com.paperengine.editor;
 import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Dimension;
-import java.awt.EventQueue;
 import java.awt.FlowLayout;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
@@ -14,11 +13,11 @@ import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JSplitPane;
+import javax.swing.JTree;
 
 import org.lwjgl.LWJGLUtil;
 
-import com.paperengine.core.PaperGame;
-import javax.swing.JTree;
+import com.paperengine.core.Editor;
 
 public class TestWindow {
 
@@ -36,7 +35,6 @@ public class TestWindow {
 			});
 		}
 		
-		gameWindow.setGame(new PaperGame());
 		gameWindow.init();
 	}
 	
@@ -44,6 +42,8 @@ public class TestWindow {
 	 * Create the application.
 	 */
 	public TestWindow() {
+		Editor.editing = true;
+		
 		initialize();
 		frame.setVisible(true);
 		initGame();

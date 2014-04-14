@@ -2,6 +2,7 @@ package com.paperengine.editor.game;
 
 import tripleplay.util.Colors;
 
+import com.paperengine.core.Circulator;
 import com.paperengine.core.GameObject;
 import com.paperengine.core.Scene;
 import com.paperengine.core.camera.Camera;
@@ -19,6 +20,7 @@ public class TestScene extends Scene {
 		ShapeRenderer renderer = new ShapeRenderer(ShapeType.Circle, 100, 100, Colors.BLUE, Colors.WHITE, 4, 0);
 		renderer.setOrigin(50, 50);
 		obj.addComponent(renderer);
+		obj.addComponent(new Circulator());
 		
 		
 		addGameObject(camera);
