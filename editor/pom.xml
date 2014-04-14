@@ -14,7 +14,7 @@
   <name>PaperEngine Editor</name>
 
   <properties>
-    <mainClass>com.paperengine.editor.Main</mainClass>
+    <mainClass>com.paperengine.editor.TestWindow</mainClass>
   </properties>
 
   <dependencies>

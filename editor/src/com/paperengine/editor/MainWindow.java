@@ -16,6 +16,7 @@ import org.lwjgl.opengl.Display;
 import playn.java.JavaPlatform;
 
 import com.paperengine.core.PaperGame;
+import com.paperengine.editor.game.JavaEditorPlatform;
 
 @SuppressWarnings("serial")
 public class MainWindow extends Frame implements WindowListener {

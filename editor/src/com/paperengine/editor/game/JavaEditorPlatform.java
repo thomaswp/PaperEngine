@@ -1,4 +1,4 @@
-package com.paperengine.editor;
+package com.paperengine.editor.game;
 
 import playn.core.Game;
 import playn.core.PlayN;

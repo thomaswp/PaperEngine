@@ -25,21 +25,6 @@ public class TestWindow {
 	private JFrame frame;
 	private GameCanvas gameWindow;
 
-	/**
-	 * Launch the application.
-	 */
-	public static void main(String[] args) {
-		EventQueue.invokeLater(new Runnable() {
-			public void run() {
-				try {
-					new TestWindow();
-				} catch (Exception e) {
-					e.printStackTrace();
-				}
-			}
-		});
-	}
-
 	private void initGame() {
 		
 		if(LWJGLUtil.getPlatform() == LWJGLUtil.PLATFORM_WINDOWS) {

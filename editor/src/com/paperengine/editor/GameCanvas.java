@@ -12,6 +12,8 @@ import playn.core.Game;
 import playn.java.JavaPlatform;
 
 import com.paperengine.core.PaperGame;
+import com.paperengine.editor.game.JavaEditorPlatform;
+import com.paperengine.editor.game.TestScene;
 
 public class GameCanvas extends Canvas {
 	private static final long serialVersionUID = 1L;
@@ -64,10 +66,19 @@ public class GameCanvas extends Canvas {
 			e.printStackTrace();
 		}
 		
+		final PaperGame game = new PaperGame();
+		game.setInitCallback(new Runnable() {
+			@Override
+			public void run() {
+				game.setScene(new TestScene());
+			}
+		});
+		
+		
 		gameThread = new Thread(new Runnable() {
 			@Override
 			public void run() {
-				platform.run(new PaperGame());
+				platform.run(game);
 			}
 		});
 		gameThread.start();
