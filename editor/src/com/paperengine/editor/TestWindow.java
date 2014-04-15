@@ -19,10 +19,20 @@ import org.lwjgl.LWJGLUtil;
 
 import com.paperengine.core.Editor;
 
+import javax.swing.JButton;
+import javax.swing.SwingConstants;
+
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
+import java.awt.peer.ButtonPeer;
+
 public class TestWindow {
 
 	private JFrame frame;
 	private GameCanvas gameWindow;
+	private JButton buttonTogglePlay;
+	private JButton buttonTogglePause;
+	private JButton buttonView;
 
 	private void initGame() {
 		
@@ -42,7 +52,8 @@ public class TestWindow {
 	 * Create the application.
 	 */
 	public TestWindow() {
-		Editor.editing = true;
+		Editor.playing = false;
+		Editor.viewingEditor = true;
 		
 		initialize();
 		frame.setVisible(true);
@@ -53,6 +64,58 @@ public class TestWindow {
 		frame.setPreferredSize(frame.getSize()); // store the current size to restore it after packing.
 		frame.setSize(frame.getWidth() + 1, frame.getHeight()); // resize it!!
 		frame.pack();
+	}
+	
+	private void togglePlay() {
+		Editor.playing = !Editor.playing;
+		updatePlayText();
+		if (Editor.paused) {
+			togglePause();
+		}
+		if (Editor.viewingEditor == Editor.playing) {
+			toggleView();
+		}
+		if (!Editor.playing) {
+			gameWindow.resetGame();
+		}
+	}
+	
+	private void updatePlayText() {
+		if (!Editor.playing) {
+			buttonTogglePlay.setText("Play");
+		} else {
+			buttonTogglePlay.setText("Stop");
+		}
+	}
+	
+	private void togglePause() {
+		Editor.paused = !Editor.paused;
+		updatePauseText();
+		if (Editor.paused && !Editor.playing) {
+			Editor.playing = true;
+			updatePlayText();
+		}
+	}
+
+	private void updatePauseText() {
+		if (!Editor.paused) {
+			buttonTogglePause.setText("Pause");
+		} else {
+			buttonTogglePause.setText("Unpause");
+		}
+	}
+
+	private void toggleView() {
+		Editor.viewingEditor = !Editor.viewingEditor;
+		updateViewText();
+	}
+
+	private void updateViewText() {
+		if (!Editor.viewingEditor) {
+			buttonView.setText("View Editor");
+		} else {
+			buttonView.setText("View Game");
+		}
 	}
 
 	/**
@@ -91,6 +154,39 @@ public class TestWindow {
 		
 		JLabel lblThisIsA = new JLabel("This is a label");
 		frame.getContentPane().add(lblThisIsA, BorderLayout.NORTH);
+		
+		JPanel panel_1 = new JPanel();
+		frame.getContentPane().add(panel_1, BorderLayout.NORTH);
+		
+		buttonTogglePlay = new JButton("Play");
+		buttonTogglePlay.setPreferredSize(new Dimension(100, 25));
+		panel_1.add(buttonTogglePlay);
+		
+		buttonTogglePause = new JButton("Pause");
+		buttonTogglePause.setPreferredSize(new Dimension(100, 25));
+		buttonTogglePause.addMouseListener(new MouseAdapter() {
+			@Override
+			public void mouseClicked(MouseEvent e) {
+				togglePause();
+			}
+		});
+		panel_1.add(buttonTogglePause);
+		
+		buttonView = new JButton("View Game");
+		buttonView.setPreferredSize(new Dimension(100, 25));
+		buttonView.addMouseListener(new MouseAdapter() {
+			@Override
+			public void mouseClicked(MouseEvent e) {
+				toggleView();
+			}
+		});
+		panel_1.add(buttonView);
+		buttonTogglePlay.addMouseListener(new MouseAdapter() {
+			@Override
+			public void mouseClicked(MouseEvent arg0) {
+				togglePlay();
+			}
+		});
 	}
 
 	protected GameCanvas gameWindow() {

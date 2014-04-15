@@ -65,7 +65,7 @@ public class GameCanvas extends Canvas {
 		}
 		
 		game = new PaperGame();
-		game.setInitCallback(new Runnable() {
+		game.post(new Runnable() {
 			@Override
 			public void run() {
 				game.setScene(new TestScene());
@@ -80,6 +80,15 @@ public class GameCanvas extends Canvas {
 			}
 		});
 		gameThread.start();
+	}
+
+	public void resetGame() {
+		game.post(new Runnable() {
+			@Override
+			public void run() {
+				game.setScene(new TestScene());
+			}
+		});
 	}
 	
 }

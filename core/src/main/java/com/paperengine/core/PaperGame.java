@@ -8,7 +8,7 @@ public class PaperGame extends Game.Default {
 
 	private Scene scene;
 	private Clock.Source clock;
-	private Runnable initCallback;
+	private Runnable callback;
 	
 	public Scene scene() {
 		return scene;
@@ -22,8 +22,8 @@ public class PaperGame extends Game.Default {
 		}
 	}
 	
-	public void setInitCallback(Runnable initCallback) {
-		this.initCallback = initCallback;
+	public void post(Runnable callback) {
+		this.callback = callback;
 	}
 	
 	public PaperGame() {
@@ -33,18 +33,22 @@ public class PaperGame extends Game.Default {
 	@Override
 	public void init() {
 		clock = new Clock.Source(16);
-		if (this.initCallback != null) {
-			this.initCallback.run();
-			this.initCallback = null;
+		if (this.callback != null) {
+			this.callback.run();
+			this.callback = null;
 		}
 	}
 
 	@Override
 	public void update(int delta) {
+		if (this.callback != null) {
+			this.callback.run();
+			this.callback = null;
+		}
 		clock.update(delta);
 		if (scene != null) {
-			if (Editor.editing) scene.updateEditor(delta); 
-			else scene.update(delta);
+			if (Editor.updateEditor()) scene.updateEditor(delta); 
+			if (Editor.updateGame()) scene.update(delta);
 		}
 	}
 
@@ -52,8 +56,8 @@ public class PaperGame extends Game.Default {
 	public void paint(float alpha) {
 		clock.paint(alpha);
 		if (scene != null) {
-			if (Editor.editing) scene.paintEditor(clock);
-			else scene.paint(clock);
+			if (Editor.updateEditor()) scene.paintEditor(clock);
+			if (Editor.updateGame()) scene.paint(clock);
 		}
 	}
 }
