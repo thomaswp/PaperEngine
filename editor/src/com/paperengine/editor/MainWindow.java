@@ -1,120 +1,193 @@
 package com.paperengine.editor;
 
-import java.awt.Canvas;
+import java.awt.BorderLayout;
+import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.FlowLayout;
-import java.awt.Frame;
-import java.awt.Label;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
-import java.awt.event.WindowListener;
+import java.beans.PropertyChangeEvent;
+import java.beans.PropertyChangeListener;
 
-import org.lwjgl.LWJGLException;
+import javax.swing.JButton;
+import javax.swing.JFrame;
+import javax.swing.JLabel;
+import javax.swing.JPanel;
+import javax.swing.JSplitPane;
+
 import org.lwjgl.LWJGLUtil;
-import org.lwjgl.opengl.Display;
 
-import playn.java.JavaPlatform;
+import com.paperengine.core.Editor;
 
-import com.paperengine.core.PaperGame;
-import com.paperengine.editor.game.JavaEditorPlatform;
+public class MainWindow {
 
-@SuppressWarnings("serial")
-public class MainWindow extends Frame implements WindowListener {
-
-	final Canvas canvas;
-	final JavaEditorPlatform platform;
-	final Thread gameThread;
+	private JFrame frame;
+	private GameCanvas gameWindow;
+	private JButton buttonTogglePlay;
+	private JButton buttonTogglePause;
+	private JButton buttonView;
+	private ObjectTree objectTree;
 	
-	final Dimension GAME_SIZE = new Dimension(800, 600);
-
-	public MainWindow() {
-		System.setProperty("org.lwjgl.input.Mouse.allowNegativeMouseCoords", "true");
+	private void initGame() {
 		
-		setSize(1000, 700);
-		setVisible(true);
-		addWindowListener(this);
-
-		setLayout(new FlowLayout());
-		
-		canvas = new Canvas();
-		canvas.setFocusTraversalKeysEnabled(false);
-		canvas.setMaximumSize(GAME_SIZE);
-		canvas.setSize(GAME_SIZE);
-
-		add(new Label("Hello"));
-		add(canvas);
-		
-		// on Windows we need to transfer focus to the Canvas
-		// otherwise keyboard input does not work when using alt-tab
 		if(LWJGLUtil.getPlatform() == LWJGLUtil.PLATFORM_WINDOWS) {
-			addWindowFocusListener(new WindowAdapter() {
+			frame.addWindowFocusListener(new WindowAdapter() {
 				@Override
 				public void windowGainedFocus(WindowEvent e) {
-					canvas.requestFocusInWindow();
+					gameWindow.requestFocusInWindow();
 				}
 			});
 		}
 		
-		JavaPlatform.Config config = new JavaPlatform.Config();
-		config.width = canvas.getWidth();
-		config.height = canvas.getHeight();
-		// use config to customize the Java platform, if needed
-		platform = JavaEditorPlatform.register(config);
+		gameWindow.init();
+		objectTree.setScene(gameWindow.scene());
+	}
+	
+	/**
+	 * Create the application.
+	 */
+	public MainWindow() {
+		Editor.playing = false;
+		Editor.viewingEditor = true;
+		
+		initialize();
+		frame.setVisible(true);
+		initGame();
+	}
 
-		try {
-			Display.setParent(canvas);
-		} catch (LWJGLException e) {
-			e.printStackTrace();
+	private void splitPaneMoved() {
+		frame.setPreferredSize(frame.getSize()); // store the current size to restore it after packing.
+		frame.setSize(frame.getWidth() + 1, frame.getHeight()); // resize it!!
+		frame.pack();
+	}
+	
+	private void togglePlay() {
+		Editor.playing = !Editor.playing;
+		updatePlayText();
+		if (Editor.paused) {
+			togglePause();
 		}
+		if (Editor.viewingEditor == Editor.playing) {
+			toggleView();
+		}
+		if (!Editor.playing) {
+			gameWindow.resetGame();
+			objectTree.setScene(gameWindow.scene());
+		}
+	}
+	
+	private void updatePlayText() {
+		if (!Editor.playing) {
+			buttonTogglePlay.setText("Play");
+		} else {
+			buttonTogglePlay.setText("Stop");
+		}
+	}
+	
+	private void togglePause() {
+		Editor.paused = !Editor.paused;
+		updatePauseText();
+		if (Editor.paused && !Editor.playing) {
+			Editor.playing = true;
+			updatePlayText();
+		}
+	}
+
+	private void updatePauseText() {
+		if (!Editor.paused) {
+			buttonTogglePause.setText("Pause");
+		} else {
+			buttonTogglePause.setText("Unpause");
+		}
+	}
+
+	private void toggleView() {
+		Editor.viewingEditor = !Editor.viewingEditor;
+		updateViewText();
+	}
+
+	private void updateViewText() {
+		if (!Editor.viewingEditor) {
+			buttonView.setText("View Editor");
+		} else {
+			buttonView.setText("View Game");
+		}
+	}
+
+	/**
+	 * Initialize the contents of the frame.
+	 */
+	private void initialize() {
+		frame = new JFrame();
+		frame.setSize(new Dimension(1000, 800));
+		frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+		frame.getContentPane().setLayout(new BorderLayout(0, 0));
 		
-		canvas.paint(getGraphics());
-		
-		gameThread = new Thread(new Runnable() {
+		JSplitPane splitPane = new JSplitPane();
+		splitPane.setContinuousLayout(true);
+		splitPane.addPropertyChangeListener(JSplitPane.DIVIDER_LOCATION_PROPERTY, new PropertyChangeListener() {
 			@Override
-			public void run() {
-				platform.run(new PaperGame());
+			public void propertyChange(PropertyChangeEvent arg0) {
+				splitPaneMoved();
 			}
 		});
-		gameThread.start();
-	}
-
-	@Override
-	public void windowActivated(WindowEvent arg0) {
-		// TODO Auto-generated method stub
-
-	}
-
-	@Override
-	public void windowClosed(WindowEvent arg0) {
-	}
-
-	@Override
-	public void windowClosing(WindowEvent arg0) {
-		System.exit(0);
-	}
-
-	@Override
-	public void windowDeactivated(WindowEvent arg0) {
+		frame.getContentPane().add(splitPane);
 		
+		JPanel leftPanel = new JPanel();
+		splitPane.setLeftComponent(leftPanel);
+		leftPanel.setLayout(new BorderLayout());
+		
+		objectTree = new ObjectTree();
+		leftPanel.add(objectTree);
+		
+		JPanel panel = new JPanel();
+		splitPane.setRightComponent(panel);
+		panel.setLayout(new FlowLayout());
+		
+		gameWindow = new GameCanvas();
+		panel.add(gameWindow);
+		gameWindow.setBackground(Color.LIGHT_GRAY);
+		
+		JLabel lblThisIsA = new JLabel("This is a label");
+		frame.getContentPane().add(lblThisIsA, BorderLayout.NORTH);
+		
+		JPanel panel_1 = new JPanel();
+		frame.getContentPane().add(panel_1, BorderLayout.NORTH);
+		
+		buttonTogglePlay = new JButton("Play");
+		buttonTogglePlay.setPreferredSize(new Dimension(100, 25));
+		panel_1.add(buttonTogglePlay);
+		
+		buttonTogglePause = new JButton("Pause");
+		buttonTogglePause.setPreferredSize(new Dimension(100, 25));
+		buttonTogglePause.addMouseListener(new MouseAdapter() {
+			@Override
+			public void mouseClicked(MouseEvent e) {
+				togglePause();
+			}
+		});
+		panel_1.add(buttonTogglePause);
+		
+		buttonView = new JButton("View Game");
+		buttonView.setPreferredSize(new Dimension(100, 25));
+		buttonView.addMouseListener(new MouseAdapter() {
+			@Override
+			public void mouseClicked(MouseEvent e) {
+				toggleView();
+			}
+		});
+		panel_1.add(buttonView);
+		buttonTogglePlay.addMouseListener(new MouseAdapter() {
+			@Override
+			public void mouseClicked(MouseEvent arg0) {
+				togglePlay();
+			}
+		});
 	}
 
-	@Override
-	public void windowDeiconified(WindowEvent arg0) {
-		// TODO Auto-generated method stub
-
+	protected GameCanvas gameWindow() {
+		return gameWindow;
 	}
-
-	@Override
-	public void windowIconified(WindowEvent arg0) {
-		// TODO Auto-generated method stub
-
-	}
-
-	@Override
-	public void windowOpened(WindowEvent arg0) {
-		// TODO Auto-generated method stub
-
-	}
-
-
 }

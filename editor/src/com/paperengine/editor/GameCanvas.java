@@ -11,6 +11,7 @@ import org.lwjgl.opengl.Display;
 import playn.java.JavaPlatform;
 
 import com.paperengine.core.PaperGame;
+import com.paperengine.core.Scene;
 import com.paperengine.editor.game.JavaEditorPlatform;
 import com.paperengine.editor.game.TestScene;
 
@@ -18,6 +19,7 @@ public class GameCanvas extends Canvas {
 	private static final long serialVersionUID = 1L;
 	
 	private PaperGame game;
+	private Scene scene;
 	private JavaEditorPlatform platform;
 	private Thread gameThread;
 	
@@ -27,6 +29,10 @@ public class GameCanvas extends Canvas {
 	
 	public PaperGame game() {
 		return game;
+	}
+	
+	public Scene scene() {
+		return scene;
 	}
 	
 	public GameCanvas() {
@@ -65,10 +71,11 @@ public class GameCanvas extends Canvas {
 		}
 		
 		game = new PaperGame();
+		scene = new TestScene();
 		game.post(new Runnable() {
 			@Override
 			public void run() {
-				game.setScene(new TestScene());
+				game.setScene(scene);
 			}
 		});
 		
@@ -83,10 +90,11 @@ public class GameCanvas extends Canvas {
 	}
 
 	public void resetGame() {
+		scene = new TestScene();
 		game.post(new Runnable() {
 			@Override
 			public void run() {
-				game.setScene(new TestScene());
+				game.setScene(scene);
 			}
 		});
 	}
