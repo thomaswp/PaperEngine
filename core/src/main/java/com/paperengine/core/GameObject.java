@@ -40,6 +40,10 @@ public class GameObject implements IUpdatable {
 	public Iterable<GameObject> children() {
 		return children;
 	}
+
+	public Iterable<Component> components() {
+		return components;
+	}
 	
 	public Transform transform() {
 		return transform;

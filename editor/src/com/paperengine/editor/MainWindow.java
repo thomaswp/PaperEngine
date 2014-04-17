@@ -3,6 +3,7 @@ package com.paperengine.editor;
 import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Dimension;
+import java.awt.EventQueue;
 import java.awt.FlowLayout;
 import java.awt.GraphicsConfiguration;
 import java.awt.event.MouseAdapter;
@@ -13,7 +14,11 @@ import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 
 import javax.swing.JFrame;
+import javax.swing.JPanel;
 import javax.swing.JSplitPane;
+import javax.swing.event.TreeSelectionEvent;
+import javax.swing.event.TreeSelectionListener;
+import javax.swing.tree.DefaultMutableTreeNode;
 
 import org.jdesktop.swingx.JXButton;
 import org.jdesktop.swingx.JXFrame;
@@ -22,6 +27,9 @@ import org.jdesktop.swingx.JXPanel;
 import org.lwjgl.LWJGLUtil;
 
 import com.paperengine.core.Editor;
+import com.paperengine.core.GameObject;
+import com.paperengine.editor.ObjectTree.GameObjectHolder;
+import com.paperengine.editor.editor.ObjectEditor;
 
 public class MainWindow {
 
@@ -31,6 +39,7 @@ public class MainWindow {
 	private JXButton buttonTogglePause;
 	private JXButton buttonView;
 	private ObjectTree objectTree;
+	private ObjectEditor objectEditor;
 	
 	private void initGame() {
 		
@@ -57,6 +66,28 @@ public class MainWindow {
 		initialize();
 		frame.setVisible(true);
 		initGame();
+		updateLater();
+	}
+
+	private void update() {
+		if (Editor.playing) {
+			objectTree.update(gameWindow.scene());
+			objectEditor.update(gameWindow.scene());
+		}
+		updateLater();
+	}
+	
+	private void updateLater() {
+		EventQueue.invokeLater(new Runnable() {
+			@Override
+			public void run() {
+				update();
+			}
+		});
+	}
+	
+	private void onGameObjectSelected(GameObject object) {
+		objectEditor.loadObject(object);
 	}
 
 	private void splitPaneMoved() {
@@ -127,33 +158,58 @@ public class MainWindow {
 		frame.setDefaultCloseOperation(JXFrame.EXIT_ON_CLOSE);
 		frame.getContentPane().setLayout(new BorderLayout(0, 0));
 		
-		JSplitPane splitPane = new JSplitPane();
-		splitPane.setContinuousLayout(true);
-		splitPane.addPropertyChangeListener(JSplitPane.DIVIDER_LOCATION_PROPERTY, new PropertyChangeListener() {
+		JSplitPane splitPaneMain = new JSplitPane();
+		splitPaneMain.setContinuousLayout(true);
+		splitPaneMain.addPropertyChangeListener(JSplitPane.DIVIDER_LOCATION_PROPERTY, new PropertyChangeListener() {
 			@Override
 			public void propertyChange(PropertyChangeEvent arg0) {
 				splitPaneMoved();
 			}
 		});
-		frame.getContentPane().add(splitPane);
+		frame.getContentPane().add(splitPaneMain);
 		
 		JXPanel leftPanel = new JXPanel();
-		splitPane.setLeftComponent(leftPanel);
+		splitPaneMain.setLeftComponent(leftPanel);
 		leftPanel.setLayout(new BorderLayout());
 		
 		objectTree = new ObjectTree();
+		objectTree.addTreeSelectionListener(new TreeSelectionListener() {
+			@Override
+			public void valueChanged(TreeSelectionEvent e) {
+				DefaultMutableTreeNode selectedNode = 
+					       (DefaultMutableTreeNode) objectTree.getLastSelectedPathComponent();
+				if (selectedNode != null && selectedNode.getUserObject() instanceof GameObjectHolder) {
+					GameObjectHolder holder = (GameObjectHolder) selectedNode.getUserObject();
+					onGameObjectSelected(holder.object);
+				} else {
+					onGameObjectSelected(null);
+				}
+			}
+		});
 		leftPanel.add(objectTree);
+
 		
-		JXPanel panel = new JXPanel();
-		splitPane.setRightComponent(panel);
-		panel.setLayout(new FlowLayout());
+		objectEditor = new ObjectEditor();
+		JXPanel panelCanvas = new JXPanel();
+		
+		JSplitPane splitPaneRight = new JSplitPane();
+		splitPaneRight.setResizeWeight(0.8);
+		splitPaneRight.setLeftComponent(panelCanvas);
+		splitPaneRight.setContinuousLayout(true);
+		splitPaneRight.setRightComponent(objectEditor);
+		splitPaneRight.addPropertyChangeListener(JSplitPane.DIVIDER_LOCATION_PROPERTY, new PropertyChangeListener() {
+			@Override
+			public void propertyChange(PropertyChangeEvent arg0) {
+				splitPaneMoved();
+			}
+		});
+		
+		splitPaneMain.setRightComponent(splitPaneRight);
+		panelCanvas.setLayout(new FlowLayout());
 		
 		gameWindow = new GameCanvas();
-		panel.add(gameWindow);
+		panelCanvas.add(gameWindow);
 		gameWindow.setBackground(Color.LIGHT_GRAY);
-		
-		JXLabel lblThisIsA = new JXLabel("This is a label");
-		frame.getContentPane().add(lblThisIsA, BorderLayout.NORTH);
 		
 		JXPanel panel_1 = new JXPanel();
 		frame.getContentPane().add(panel_1, BorderLayout.NORTH);

@@ -9,5 +9,6 @@ public class Circulator extends Component {
 		time += delta / 500;
 		gameObject.transform().position.set(30 * (float) Math.sin(time), 
 				30 * (float) Math.cos(time));
+		gameObject.transform().rotation = time / 50;
 	}
 }
