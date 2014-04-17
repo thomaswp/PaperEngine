@@ -14,13 +14,32 @@ import com.paperengine.core.render.Renderer;
 
 public class GameObject implements IUpdatable {
 	
+	private List<GameObject> children = new ArrayList<GameObject>();
 	private List<Component> components = new ArrayList<Component>();
+	private GameObject parent;
 	private boolean enabled = true;
 	private Transform transform;
 	private Renderer renderer;
 	private Camera camera;
+	private String name;
 	
 	private GroupLayer layer;
+	
+	public String name() {
+		return name;
+	}
+	
+	public void setName(String name) {
+		this.name = name;
+	}
+	
+	public GameObject parent() {
+		return parent;
+	}
+	
+	public Iterable<GameObject> children() {
+		return children;
+	}
 	
 	public Transform transform() {
 		return transform;
@@ -80,6 +99,7 @@ public class GameObject implements IUpdatable {
 	public GameObject() {
 		components.add(transform = new Transform());
 		layer = graphics().createGroupLayer();
+		name = getClass().getSimpleName();
 	}
 	
 	public void addComponent(Component component) {
@@ -100,6 +120,21 @@ public class GameObject implements IUpdatable {
 			setRenderer(null);
 		}
 		return components.remove(component);
+	}
+	
+	public void addChild(GameObject child) {
+		children.add(child);
+		child.parent = this;
+		layer.add(child.layer());
+	}
+	
+	public boolean removeChild(GameObject child) {
+		if (children.remove(child)) {
+			child.parent = null;
+			layer.remove(child.layer());
+			return true;
+		}
+		return false;
 	}
 	
 	@SuppressWarnings("unchecked")
@@ -127,6 +162,9 @@ public class GameObject implements IUpdatable {
 		for (Component component : components) {
 			component.update(delta);
 		}
+		for (GameObject child : children) {
+			if (child.enabled) child.update(delta);
+		}
 	}
 	
 	public void paint(Clock clock) {
@@ -134,6 +172,9 @@ public class GameObject implements IUpdatable {
 			component.paint(clock);
 		}
 		updateTransform();
+		for (GameObject child : children) {
+			if (child.enabled) child.paint(clock);
+		}
 	}
 
 	@Override
@@ -141,12 +182,18 @@ public class GameObject implements IUpdatable {
 		for (Component component : components) {
 			component.updateEditor(delta);
 		}
+		for (GameObject child : children) {
+			child.updateEditor(delta);
+		}
 	}
 
 	@Override
 	public void paintEditor(Clock clock) {
 		for (Component component : components) {
 			component.paintEditor(clock);
+		}
+		for (GameObject child : children) {
+			child.paintEditor(clock);
 		}
 		updateTransform();
 	}

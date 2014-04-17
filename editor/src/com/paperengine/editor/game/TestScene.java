@@ -22,6 +22,13 @@ public class TestScene extends Scene {
 		obj.addComponent(renderer);
 		obj.addComponent(new Circulator());
 		
+		GameObject child = new GameObject();
+		ShapeRenderer childRenderer = new ShapeRenderer(ShapeType.Rectangle, 50, 50, Colors.RED, Colors.WHITE, 2, 0);
+		childRenderer.setOrigin(25, 25);
+		child.addComponent(childRenderer);
+		child.addComponent(new Circulator());
+		
+		obj.addChild(child);;
 		
 		addGameObject(camera);
 		addGameObject(obj);

@@ -98,7 +98,7 @@ public class ShapeRenderer extends CanvasRenderer {
 		canvas.setStrokeWidth(borderWidth);
 		switch (shapeType) {
 		case Circle: canvas.strokeCircle(w / 2, h / 2, minWH / 2 - borderWidth / 2); break;
-		case Rectangle: canvas.strokeRect(padding, padding, w - borderWidth, h - borderColor); break;
+		case Rectangle: canvas.strokeRect(padding, padding, w - borderWidth / 2, h - borderWidth / 2); break;
 		case RoundRectangle: canvas.strokeRoundRect(
 				padding, padding, w, h, roundRectRadius); break;
 		}

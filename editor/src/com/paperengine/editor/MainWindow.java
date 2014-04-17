@@ -4,6 +4,7 @@ import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.FlowLayout;
+import java.awt.GraphicsConfiguration;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.awt.event.WindowAdapter;
@@ -11,12 +12,13 @@ import java.awt.event.WindowEvent;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 
-import javax.swing.JButton;
 import javax.swing.JFrame;
-import javax.swing.JLabel;
-import javax.swing.JPanel;
 import javax.swing.JSplitPane;
 
+import org.jdesktop.swingx.JXButton;
+import org.jdesktop.swingx.JXFrame;
+import org.jdesktop.swingx.JXLabel;
+import org.jdesktop.swingx.JXPanel;
 import org.lwjgl.LWJGLUtil;
 
 import com.paperengine.core.Editor;
@@ -25,9 +27,9 @@ public class MainWindow {
 
 	private JFrame frame;
 	private GameCanvas gameWindow;
-	private JButton buttonTogglePlay;
-	private JButton buttonTogglePause;
-	private JButton buttonView;
+	private JXButton buttonTogglePlay;
+	private JXButton buttonTogglePause;
+	private JXButton buttonView;
 	private ObjectTree objectTree;
 	
 	private void initGame() {
@@ -122,7 +124,7 @@ public class MainWindow {
 	private void initialize() {
 		frame = new JFrame();
 		frame.setSize(new Dimension(1000, 800));
-		frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+		frame.setDefaultCloseOperation(JXFrame.EXIT_ON_CLOSE);
 		frame.getContentPane().setLayout(new BorderLayout(0, 0));
 		
 		JSplitPane splitPane = new JSplitPane();
@@ -135,14 +137,14 @@ public class MainWindow {
 		});
 		frame.getContentPane().add(splitPane);
 		
-		JPanel leftPanel = new JPanel();
+		JXPanel leftPanel = new JXPanel();
 		splitPane.setLeftComponent(leftPanel);
 		leftPanel.setLayout(new BorderLayout());
 		
 		objectTree = new ObjectTree();
 		leftPanel.add(objectTree);
 		
-		JPanel panel = new JPanel();
+		JXPanel panel = new JXPanel();
 		splitPane.setRightComponent(panel);
 		panel.setLayout(new FlowLayout());
 		
@@ -150,17 +152,17 @@ public class MainWindow {
 		panel.add(gameWindow);
 		gameWindow.setBackground(Color.LIGHT_GRAY);
 		
-		JLabel lblThisIsA = new JLabel("This is a label");
+		JXLabel lblThisIsA = new JXLabel("This is a label");
 		frame.getContentPane().add(lblThisIsA, BorderLayout.NORTH);
 		
-		JPanel panel_1 = new JPanel();
+		JXPanel panel_1 = new JXPanel();
 		frame.getContentPane().add(panel_1, BorderLayout.NORTH);
 		
-		buttonTogglePlay = new JButton("Play");
+		buttonTogglePlay = new JXButton("Play");
 		buttonTogglePlay.setPreferredSize(new Dimension(100, 25));
 		panel_1.add(buttonTogglePlay);
 		
-		buttonTogglePause = new JButton("Pause");
+		buttonTogglePause = new JXButton("Pause");
 		buttonTogglePause.setPreferredSize(new Dimension(100, 25));
 		buttonTogglePause.addMouseListener(new MouseAdapter() {
 			@Override
@@ -170,7 +172,7 @@ public class MainWindow {
 		});
 		panel_1.add(buttonTogglePause);
 		
-		buttonView = new JButton("View Game");
+		buttonView = new JXButton("View Game");
 		buttonView.setPreferredSize(new Dimension(100, 25));
 		buttonView.addMouseListener(new MouseAdapter() {
 			@Override
