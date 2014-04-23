@@ -2,25 +2,26 @@ package com.paperengine.editor.editor.field;
 
 import java.lang.reflect.Field;
 
-import javax.swing.JPanel;
+import org.eclipse.swt.SWT;
+import org.eclipse.swt.widgets.Composite;
 
 import com.paperengine.core.Component;
 import com.paperengine.core.Scene;
 
-public abstract class FieldEditor<T> extends JPanel {
-	private static final long serialVersionUID = 1L;
+public abstract class FieldEditor<T> extends Composite {
 	
 	protected Component component;
 	protected Field field;
 	
-	public FieldEditor(Component component, Field field) {	
+	public FieldEditor(Composite parent, Component component, Field field) {
+		super(parent, SWT.NONE);
 		this.component = component;
 		this.field = field;
 	}
 	
-	public static FieldEditor<?> create(Component component, Field field) {
+	public static FieldEditor<?> create(Composite parent, Component component, Field field) {
 		if (field.getType() == float.class || field.getType() == Float.class) {
-			return new FloatFieldEditor(component, field); 
+			return new FloatFieldEditor(parent, component, field); 
 		}
 		return null;
 	}

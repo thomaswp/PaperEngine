@@ -24,12 +24,10 @@ import org.eclipse.swt.widgets.MenuItem;
 import org.eclipse.swt.widgets.Shell;
 
 import com.paperengine.core.Editor;
+import com.paperengine.editor.editor.ObjectEditor;
+import org.eclipse.swt.widgets.Label;
 
 
-/**
- * @author triston
- * 
- */
 public class SWTMainWindow {
 
 	private Display display;
@@ -38,6 +36,7 @@ public class SWTMainWindow {
 	private Button buttonTogglePause;
 	private Button buttonTogglePlay;
 	private ObjectTree objectTree;
+	private ObjectEditor objectEditor;
 	
 	public static void main(String[] args) {
 		
@@ -170,13 +169,13 @@ public class SWTMainWindow {
 		SashForm sashFormHorizontal = new SashForm(sashFormVertical, SWT.NONE);
 		sashFormHorizontal.setTouchEnabled(true);
 		
-		ScrolledComposite scrolledComposite = new ScrolledComposite(sashFormHorizontal, SWT.BORDER | SWT.H_SCROLL | SWT.V_SCROLL);
-		scrolledComposite.setExpandHorizontal(true);
-		scrolledComposite.setExpandVertical(true);
+		ScrolledComposite scrolledCompositeObjectTree = new ScrolledComposite(sashFormHorizontal, SWT.BORDER | SWT.H_SCROLL | SWT.V_SCROLL);
+		scrolledCompositeObjectTree.setExpandHorizontal(true);
+		scrolledCompositeObjectTree.setExpandVertical(true);
 		
-		objectTree = new ObjectTree(scrolledComposite, SWT.BORDER);
-		scrolledComposite.setContent(objectTree.tree());
-		scrolledComposite.setMinSize(objectTree.tree().computeSize(SWT.DEFAULT, SWT.DEFAULT));
+		objectTree = new ObjectTree(scrolledCompositeObjectTree, SWT.BORDER);
+		scrolledCompositeObjectTree.setContent(objectTree.tree());
+		scrolledCompositeObjectTree.setMinSize(objectTree.tree().computeSize(SWT.DEFAULT, SWT.DEFAULT));
 		
 		final Composite composite = new Composite(sashFormHorizontal, SWT.EMBEDDED);
 		composite.setDragDetect(false);
@@ -191,10 +190,19 @@ public class SWTMainWindow {
 		panel.add(gameCanvas);
 		gameCanvas.init();
 		
-		ScrolledComposite scrolledComposite_1 = new ScrolledComposite(sashFormHorizontal, SWT.BORDER | SWT.H_SCROLL | SWT.V_SCROLL);
-		scrolledComposite_1.setExpandHorizontal(true);
-		scrolledComposite_1.setExpandVertical(true);
+		ScrolledComposite scrolledCompositeObjectEditor = new ScrolledComposite(sashFormHorizontal, SWT.BORDER | SWT.H_SCROLL | SWT.V_SCROLL);
+		scrolledCompositeObjectEditor.setExpandHorizontal(true);
+		scrolledCompositeObjectEditor.setExpandVertical(true);
 		sashFormHorizontal.setWeights(new int[] {174, 635, 193});
+		
+		objectEditor = new ObjectEditor(scrolledCompositeObjectEditor, SWT.NONE);
+		objectEditor.setLayout(new RowLayout(SWT.VERTICAL));
+		
+		Label lblNewLabel = new Label(objectEditor, SWT.NONE);
+		lblNewLabel.setText("New Label");
+		
+		scrolledCompositeObjectEditor.setContent(objectEditor);
+		scrolledCompositeObjectEditor.setMinSize(objectEditor.computeSize(SWT.DEFAULT, SWT.DEFAULT));
 		
 		Composite compositeDebug = new Composite(sashFormVertical, SWT.NONE);
 		compositeDebug.setLayout(new RowLayout(SWT.HORIZONTAL));
@@ -219,6 +227,7 @@ public class SWTMainWindow {
 
 		while (!shell.isDisposed()) {
 			if (!display.readAndDispatch()) {
+				update();
 				display.sleep();
 			}
 		}
@@ -227,6 +236,12 @@ public class SWTMainWindow {
 
 	public void start() {
 		objectTree.setScene(gameCanvas.scene());
+		objectEditor.loadObject(gameCanvas.scene().gameObjects().iterator().next());
+	}
+	
+	public void update() {
+		objectTree.update(gameCanvas.scene());
+		objectEditor.update(gameCanvas.scene());
 	}
 	
 	public static MouseEvent toAwtMouseEvent(org.eclipse.swt.events.MouseEvent event, Component compoment) {

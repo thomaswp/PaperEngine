@@ -1,33 +1,26 @@
 package com.paperengine.editor.editor;
 
-import java.awt.Color;
-
-import javax.swing.BorderFactory;
-import javax.swing.BoxLayout;
-import javax.swing.JLabel;
-import javax.swing.JPanel;
+import org.eclipse.swt.SWT;
+import org.eclipse.swt.widgets.Composite;
+import org.eclipse.swt.widgets.Label;
 
 import com.paperengine.core.Component;
 import com.paperengine.core.Scene;
 
-public abstract class ComponentEditor<T extends Component> extends JPanel {
-	private static final long serialVersionUID = 1L;
+public abstract class ComponentEditor<T extends Component> extends Composite {
 	
 	protected T component;
-	protected JLabel nameLabel;
+	protected Label nameLabel;
 	
-	public ComponentEditor(T component) {
+	public ComponentEditor(Composite parent, T component) {
+		super(parent, SWT.NONE);
 		this.component = component;
 		
-		setBorder(BorderFactory.createLineBorder(Color.black));
-		setLayout(new BoxLayout(this, BoxLayout.Y_AXIS));
-		
-		nameLabel = new JLabel(component.getClass().getSimpleName());
-		add(nameLabel);
+		nameLabel = new Label(this, SWT.NONE);
 	}
 
-	public static ComponentEditor<?> create(Component component) {
-		return new DefaultComponentEditor(component);
+	public static ComponentEditor<?> create(Composite parent, Component component) {
+		return new DefaultComponentEditor(parent, component);
 	}
 
 	public void update(Scene scene) {

@@ -1,31 +1,30 @@
 package com.paperengine.editor.editor.field;
 
-import java.awt.Dimension;
 import java.lang.reflect.Field;
 
-import javax.swing.JLabel;
-import javax.swing.JTextField;
+import org.eclipse.swt.SWT;
+import org.eclipse.swt.widgets.Composite;
+import org.eclipse.swt.widgets.Label;
+import org.eclipse.swt.widgets.Text;
 
 import com.paperengine.core.Component;
 import com.paperengine.core.Editor;
 import com.paperengine.core.Scene;
 
 public class FloatFieldEditor extends FieldEditor<Float> {
-	private static final long serialVersionUID = 1L;
 	
-	protected JLabel labelName;
-	protected JTextField textFieldValue;
+	protected Label labelName;
+	protected Text textFieldValue;
 	protected String name;
 
-	public FloatFieldEditor(Component component, Field field) {
-		super(component, field);
+	public FloatFieldEditor(Composite parent, Component component, Field field) {
+		super(parent, component, field);
 		
 		name = field.getName();
-		labelName = new JLabel(name + ": ");
-		textFieldValue = new JTextField(getText());
-		textFieldValue.setMinimumSize(new Dimension(100, textFieldValue.getHeight()));
-		add(labelName);
-		add(textFieldValue);
+		labelName = new Label(this, SWT.NONE);
+		labelName.setText(name + ": ");
+		textFieldValue = new Text(this, SWT.NONE);
+		textFieldValue.setText(getText());
 		
 	}
 

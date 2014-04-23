@@ -3,41 +3,42 @@ package com.paperengine.editor.editor;
 import java.util.ArrayList;
 import java.util.List;
 
-import javax.swing.BoxLayout;
-import javax.swing.JLabel;
-import javax.swing.JPanel;
+import org.eclipse.swt.SWT;
+import org.eclipse.swt.layout.FillLayout;
+import org.eclipse.swt.layout.GridLayout;
+import org.eclipse.swt.layout.RowData;
+import org.eclipse.swt.layout.RowLayout;
+import org.eclipse.swt.widgets.Composite;
+import org.eclipse.swt.widgets.Label;
 
 import com.paperengine.core.Component;
 import com.paperengine.core.GameObject;
 import com.paperengine.core.Scene;
 
-public class ObjectEditor extends JPanel {
-	private static final long serialVersionUID = 1L;
+public class ObjectEditor extends Composite {
 	
-	JLabel labelName;
+	Label labelName;
 	List<ComponentEditor<?>> editors = new ArrayList<ComponentEditor<?>>();
 	
-	public ObjectEditor() {
-		BoxLayout layout = new BoxLayout(this, BoxLayout.Y_AXIS);
-		setLayout(layout);
+	public ObjectEditor(Composite parent, int flags) {
+		super(parent, flags);
 		
-		labelName = new JLabel();
+		labelName = new Label(this, SWT.NONE);
 	}
 	
 	public void loadObject(GameObject object) {
-		removeAll();
+		for (ComponentEditor<?> editor : editors) {
+			editor.dispose();
+		}
 		
 		if (object == null) {
 			labelName.setText("");
-			add(labelName);
 		} else {
 			labelName.setText(object.name());
-			add(labelName);
 			
 			editors.clear();
 			for (Component component : object.components()) {
-				ComponentEditor<?> editor = ComponentEditor.create(component);
-				add(editor);
+				ComponentEditor<?> editor = ComponentEditor.create(this, component);
 				editors.add(editor);
 			}
 		}
