@@ -1,51 +1,48 @@
 package com.paperengine.editor;
 
-import java.awt.Dimension;
-
-import javax.swing.event.TreeSelectionEvent;
-import javax.swing.event.TreeSelectionListener;
-import javax.swing.tree.DefaultMutableTreeNode;
-import javax.swing.tree.DefaultTreeModel;
-import javax.swing.tree.MutableTreeNode;
-
-import org.jdesktop.swingx.JXTree;
+import org.eclipse.swt.SWT;
+import org.eclipse.swt.widgets.Composite;
+import org.eclipse.swt.widgets.Tree;
+import org.eclipse.swt.widgets.TreeItem;
 
 import com.paperengine.core.GameObject;
 import com.paperengine.core.Scene;
 
-public class ObjectTree extends JXTree {
-	private static final long serialVersionUID = 1L;
+public class ObjectTree  {
 
+	private Tree tree;
 	private Scene scene;
 	
-	public ObjectTree() {
-		setEditable(true);
-		setMinimumSize(new Dimension(100, 0));
-	}
 	
+	public ObjectTree(Composite arg0, int arg1) {
+		tree = new Tree(arg0, arg1);
+	}
+
 	public void setScene(Scene scene) {
 		this.scene = scene;
 		refresh();
 	}
 
 	private void refresh() {
-		DefaultTreeModel model = (DefaultTreeModel) getModel();
-		DefaultMutableTreeNode root = (DefaultMutableTreeNode) model.getRoot();
-		root.setUserObject("Scene");
-		root.removeAllChildren();
+		tree.removeAll();
 		if (scene == null) return;
 		for (GameObject object : scene.gameObjects()) {
-			root.add(getNodeForObject(object));
+			createTreeItemForObject(object, null);
 		}
-		model.reload();
 	}
 	
-	private MutableTreeNode getNodeForObject(GameObject object) {
-		DefaultMutableTreeNode node = new DefaultMutableTreeNode(new GameObjectHolder(object));
-		for (GameObject child : object.children()) {
-			node.add(getNodeForObject(child));
+	private TreeItem createTreeItemForObject(GameObject object, TreeItem parent) {
+		TreeItem item;
+		if (parent == null) {
+			item = new TreeItem(tree, 0);
+		} else {
+			item = new TreeItem(parent, SWT.NONE);
 		}
-		return node;
+		item.setText(object.name());
+		for (GameObject child : object.children()) {
+			createTreeItemForObject(child, item);
+		}
+		return item;
 	}
 	
 	public static class GameObjectHolder {
@@ -63,5 +60,9 @@ public class ObjectTree extends JXTree {
 
 	public void update(Scene scene) {
 		
+	}
+
+	public Tree tree() {
+		return tree;
 	}
 }

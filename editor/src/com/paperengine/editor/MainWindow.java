@@ -5,7 +5,6 @@ import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.EventQueue;
 import java.awt.FlowLayout;
-import java.awt.GraphicsConfiguration;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.awt.event.WindowAdapter;
@@ -14,25 +13,21 @@ import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 
 import javax.swing.JFrame;
-import javax.swing.JPanel;
 import javax.swing.JSplitPane;
-import javax.swing.event.TreeSelectionEvent;
-import javax.swing.event.TreeSelectionListener;
-import javax.swing.tree.DefaultMutableTreeNode;
 
 import org.jdesktop.swingx.JXButton;
 import org.jdesktop.swingx.JXFrame;
-import org.jdesktop.swingx.JXLabel;
 import org.jdesktop.swingx.JXPanel;
 import org.lwjgl.LWJGLUtil;
 
 import com.paperengine.core.Editor;
 import com.paperengine.core.GameObject;
-import com.paperengine.editor.ObjectTree.GameObjectHolder;
 import com.paperengine.editor.editor.ObjectEditor;
 
 public class MainWindow {
 
+	public final static int FPS = 10;
+	
 	private JFrame frame;
 	private GameCanvas gameWindow;
 	private JXButton buttonTogglePlay;
@@ -40,6 +35,7 @@ public class MainWindow {
 	private JXButton buttonView;
 	private ObjectTree objectTree;
 	private ObjectEditor objectEditor;
+	private boolean updating;
 	
 	private void initGame() {
 		
@@ -66,7 +62,23 @@ public class MainWindow {
 		initialize();
 		frame.setVisible(true);
 		initGame();
-		updateLater();
+		
+		new Thread(new Runnable() {
+			@Override
+			public void run() {
+				int mspf = 1000 / FPS;
+				long lastUpdate = System.currentTimeMillis();
+				while (true) {
+					long time = System.currentTimeMillis();
+					long sleep = mspf - (time - lastUpdate);
+					try {
+						if (sleep > 0) Thread.sleep(sleep);
+					} catch (Exception e) { }
+					updateLater();
+					lastUpdate = time;
+				}
+			}
+		}).start();;
 	}
 
 	private void update() {
@@ -74,14 +86,16 @@ public class MainWindow {
 			objectTree.update(gameWindow.scene());
 			objectEditor.update(gameWindow.scene());
 		}
-		updateLater();
 	}
 	
 	private void updateLater() {
+		if (updating) return;
+		updating = true;
 		EventQueue.invokeLater(new Runnable() {
 			@Override
 			public void run() {
 				update();
+				updating = false;
 			}
 		});
 	}
@@ -172,21 +186,21 @@ public class MainWindow {
 		splitPaneMain.setLeftComponent(leftPanel);
 		leftPanel.setLayout(new BorderLayout());
 		
-		objectTree = new ObjectTree();
-		objectTree.addTreeSelectionListener(new TreeSelectionListener() {
-			@Override
-			public void valueChanged(TreeSelectionEvent e) {
-				DefaultMutableTreeNode selectedNode = 
-					       (DefaultMutableTreeNode) objectTree.getLastSelectedPathComponent();
-				if (selectedNode != null && selectedNode.getUserObject() instanceof GameObjectHolder) {
-					GameObjectHolder holder = (GameObjectHolder) selectedNode.getUserObject();
-					onGameObjectSelected(holder.object);
-				} else {
-					onGameObjectSelected(null);
-				}
-			}
-		});
-		leftPanel.add(objectTree);
+//		objectTree = new ObjectTree();
+//		objectTree.addTreeSelectionListener(new TreeSelectionListener() {
+//			@Override
+//			public void valueChanged(TreeSelectionEvent e) {
+//				DefaultMutableTreeNode selectedNode = 
+//					       (DefaultMutableTreeNode) objectTree.getLastSelectedPathComponent();
+//				if (selectedNode != null && selectedNode.getUserObject() instanceof GameObjectHolder) {
+//					GameObjectHolder holder = (GameObjectHolder) selectedNode.getUserObject();
+//					onGameObjectSelected(holder.object);
+//				} else {
+//					onGameObjectSelected(null);
+//				}
+//			}
+//		});
+//		leftPanel.add(objectTree);
 
 		
 		objectEditor = new ObjectEditor();
