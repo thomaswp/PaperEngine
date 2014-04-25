@@ -39,23 +39,11 @@ public class ObjectTree  {
 			item = new TreeItem(parent, SWT.NONE);
 		}
 		item.setText(object.name());
+		item.setData(object);
 		for (GameObject child : object.children()) {
 			createTreeItemForObject(child, item);
 		}
 		return item;
-	}
-	
-	public static class GameObjectHolder {
-		public GameObject object;
-		
-		public GameObjectHolder(GameObject object) {
-			this.object = object;
-		}
-		
-		@Override
-		public String toString() {
-			return object.name();
-		}
 	}
 
 	public void update(Scene scene) {

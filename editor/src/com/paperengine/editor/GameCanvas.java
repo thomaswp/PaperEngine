@@ -56,6 +56,10 @@ public class GameCanvas extends Canvas {
 //		return new Dimension(800, 600);
 	}
 	
+	public void dispose() {
+		platform.dispose();
+	}
+	
 	public void init() {
 		
 		JavaPlatform.Config config = new JavaPlatform.Config();

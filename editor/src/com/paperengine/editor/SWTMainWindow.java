@@ -11,6 +11,8 @@ import org.eclipse.swt.awt.SWT_AWT;
 import org.eclipse.swt.custom.SashForm;
 import org.eclipse.swt.custom.ScrolledComposite;
 import org.eclipse.swt.events.MouseAdapter;
+import org.eclipse.swt.events.SelectionEvent;
+import org.eclipse.swt.events.SelectionListener;
 import org.eclipse.swt.graphics.Point;
 import org.eclipse.swt.layout.FillLayout;
 import org.eclipse.swt.layout.GridData;
@@ -24,8 +26,8 @@ import org.eclipse.swt.widgets.MenuItem;
 import org.eclipse.swt.widgets.Shell;
 
 import com.paperengine.core.Editor;
+import com.paperengine.core.GameObject;
 import com.paperengine.editor.editor.ObjectEditor;
-import org.eclipse.swt.widgets.Label;
 
 
 public class SWTMainWindow {
@@ -37,6 +39,7 @@ public class SWTMainWindow {
 	private Button buttonTogglePlay;
 	private ObjectTree objectTree;
 	private ObjectEditor objectEditor;
+	private Frame awtFrame;
 	
 	public static void main(String[] args) {
 		
@@ -95,6 +98,11 @@ public class SWTMainWindow {
 		} else {
 			buttonToggleView.setText("View Game");
 		}
+	}
+
+	
+	private void gameObjectSelected(GameObject object) {
+		objectEditor.loadObject(object);
 	}
 	
 	public void open() {
@@ -176,14 +184,25 @@ public class SWTMainWindow {
 		objectTree = new ObjectTree(scrolledCompositeObjectTree, SWT.BORDER);
 		scrolledCompositeObjectTree.setContent(objectTree.tree());
 		scrolledCompositeObjectTree.setMinSize(objectTree.tree().computeSize(SWT.DEFAULT, SWT.DEFAULT));
+		objectTree.tree().addSelectionListener(new SelectionListener() {
+			@Override
+			public void widgetSelected(SelectionEvent event) {
+				gameObjectSelected((GameObject) event.item.getData());
+			}
+
+			@Override
+			public void widgetDefaultSelected(SelectionEvent event) {
+				gameObjectSelected(null);
+			}
+		});
 		
 		final Composite composite = new Composite(sashFormHorizontal, SWT.EMBEDDED);
 		composite.setDragDetect(false);
 		
-		final Frame frame = SWT_AWT.new_Frame(composite);		
+		awtFrame = SWT_AWT.new_Frame(composite);
 		
 		Panel panel = new Panel();
-		frame.add(panel);
+		awtFrame.add(panel);
 		panel.setLayout(new BorderLayout(0, 0));
 		
 		gameCanvas = new GameCanvas();
@@ -196,10 +215,9 @@ public class SWTMainWindow {
 		sashFormHorizontal.setWeights(new int[] {174, 635, 193});
 		
 		objectEditor = new ObjectEditor(scrolledCompositeObjectEditor, SWT.NONE);
-		objectEditor.setLayout(new RowLayout(SWT.VERTICAL));
-		
-		Label lblNewLabel = new Label(objectEditor, SWT.NONE);
-		lblNewLabel.setText("New Label");
+		RowLayout rl_objectEditor = new RowLayout(SWT.VERTICAL);
+		rl_objectEditor.fill = true;
+		objectEditor.setLayout(rl_objectEditor);
 		
 		scrolledCompositeObjectEditor.setContent(objectEditor);
 		scrolledCompositeObjectEditor.setMinSize(objectEditor.computeSize(SWT.DEFAULT, SWT.DEFAULT));
@@ -231,12 +249,12 @@ public class SWTMainWindow {
 				display.sleep();
 			}
 		}
+		gameCanvas.dispose();
 		display.dispose();
 	}
 
 	public void start() {
 		objectTree.setScene(gameCanvas.scene());
-		objectEditor.loadObject(gameCanvas.scene().gameObjects().iterator().next());
 	}
 	
 	public void update() {

@@ -4,10 +4,6 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.eclipse.swt.SWT;
-import org.eclipse.swt.layout.FillLayout;
-import org.eclipse.swt.layout.GridLayout;
-import org.eclipse.swt.layout.RowData;
-import org.eclipse.swt.layout.RowLayout;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Label;
 
@@ -36,6 +32,9 @@ public class ObjectEditor extends Composite {
 		} else {
 			labelName.setText(object.name());
 			
+			for (ComponentEditor<?> editor : editors) {
+				editor.dispose();
+			}
 			editors.clear();
 			for (Component component : object.components()) {
 				ComponentEditor<?> editor = ComponentEditor.create(this, component);
@@ -43,8 +42,7 @@ public class ObjectEditor extends Composite {
 			}
 		}
 		
-		this.setVisible(false);
-		this.setVisible(true);
+		this.layout();
 	}
 
 	public void update(Scene scene) {

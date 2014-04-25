@@ -1,5 +1,8 @@
 package com.paperengine.editor.game;
 
+import org.lwjgl.LWJGLException;
+import org.lwjgl.opengl.Display;
+
 import playn.core.Game;
 import playn.core.PlayN;
 import playn.java.JavaGraphics;
@@ -14,9 +17,14 @@ public class JavaEditorPlatform extends JavaPlatform {
 	public static JavaPlatform register() {
 		return register(new Config());
 	}
-	
+
 	boolean resize;
 	int width, height;
+	boolean dispose;
+
+	public void dispose() {
+		dispose = true;
+	}
 
 	/**
 	 * Registers the Java platform with the specified configuration.
@@ -41,12 +49,12 @@ public class JavaEditorPlatform extends JavaPlatform {
 		this.height = height;
 		resize = true;
 	}
-	
+
 	@Override
 	protected JavaGraphics createGraphics(Config config) {
 		return new JavaEditorGraphics(this, config);
 	}
-	
+
 	@Override
 	protected void processFrame(Game game) {
 		if (resize) {
@@ -55,7 +63,54 @@ public class JavaEditorPlatform extends JavaPlatform {
 		}
 		super.processFrame(game);
 	}
-	
+
 	private static JavaEditorPlatform testInstance;
 
+
+	@Override
+	public void run(final Game game) {
+		try {
+			Display.create();
+		} catch (LWJGLException e) {
+			throw new RuntimeException(e);
+		}
+		init(game);
+
+		boolean wasActive = Display.isActive();
+		while (!Display.isCloseRequested() && !dispose) {
+			// Notify the app if lose or regain focus (treat said as pause/resume).
+			boolean newActive = Display.isActive();
+			if (wasActive != newActive) {
+				if (wasActive)
+					onPause();
+				else
+					onResume();
+				wasActive = newActive;
+			}
+			processFrame(game);
+			Display.update();
+			// Sleep until it's time for the next frame.
+			Display.sync(60);
+		}
+		System.out.println("!");
+
+		shutdown();
+		System.out.println("!!");
+	}
+	
+	protected void shutdown() {
+		// let the game run any of its exit hooks
+		onExit();
+
+		// shutdown our thread pool
+//		try {
+//			_exec.shutdown();
+//			_exec.awaitTermination(1, TimeUnit.SECONDS);
+//		} catch (InterruptedException ie) {
+//			// nothing to do here except go ahead and exit
+//		}
+
+		// and finally stick a fork in the JVM
+		System.exit(0);
+	}
 }

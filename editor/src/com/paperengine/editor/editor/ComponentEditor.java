@@ -1,6 +1,7 @@
 package com.paperengine.editor.editor;
 
 import org.eclipse.swt.SWT;
+import org.eclipse.swt.layout.RowLayout;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Label;
 
@@ -13,10 +14,12 @@ public abstract class ComponentEditor<T extends Component> extends Composite {
 	protected Label nameLabel;
 	
 	public ComponentEditor(Composite parent, T component) {
-		super(parent, SWT.NONE);
+		super(parent, SWT.BORDER);
+		setLayout(new RowLayout(SWT.VERTICAL));
 		this.component = component;
 		
 		nameLabel = new Label(this, SWT.NONE);
+		nameLabel.setText(component.getClass().getSimpleName());
 	}
 
 	public static ComponentEditor<?> create(Composite parent, Component component) {
