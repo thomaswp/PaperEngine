@@ -20,6 +20,7 @@ public class PaperGame extends Game.Default {
 		if (scene != null) {
 			graphics().rootLayer().add(scene.layer());
 		}
+		mouse().setListener(scene);
 	}
 	
 	public void post(Runnable callback) {

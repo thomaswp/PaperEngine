@@ -4,6 +4,8 @@ import java.awt.Canvas;
 import java.awt.Dimension;
 import java.awt.event.ComponentAdapter;
 import java.awt.event.ComponentEvent;
+import java.util.ArrayList;
+import java.util.List;
 
 import org.lwjgl.LWJGLException;
 import org.lwjgl.opengl.Display;
@@ -17,6 +19,8 @@ import com.paperengine.editor.game.TestScene;
 
 public class GameCanvas extends Canvas {
 	private static final long serialVersionUID = 1L;
+	
+	private List<Scene> sceneStack = new ArrayList<Scene>();
 	
 	private PaperGame game;
 	private Scene scene;
@@ -93,8 +97,17 @@ public class GameCanvas extends Canvas {
 		gameThread.start();
 	}
 
-	public void resetGame() {
-		scene = new TestScene();
+	public void pushScene() {
+		sceneStack.add(0, scene);
+		setScene(new TestScene());
+	}
+	
+	public void popScene() {
+		setScene(sceneStack.remove(0));
+	}
+	
+	public void setScene(final Scene scene) {
+		this.scene = scene;
 		game.post(new Runnable() {
 			@Override
 			public void run() {

@@ -22,8 +22,22 @@ public class GameObject implements IUpdatable {
 	private Renderer renderer;
 	private Camera camera;
 	private String name;
+	private Scene scene;
+	private int id;
 	
 	private GroupLayer layer;
+	
+	public int id() {
+		return id;
+	}
+
+	protected void setScene(Scene scene) {
+		this.scene = scene;
+		this.id = scene.registerGameObject(this);
+		for (GameObject child : children) {
+			child.setScene(scene);
+		}
+	}
 	
 	public String name() {
 		return name;
@@ -130,6 +144,7 @@ public class GameObject implements IUpdatable {
 		children.add(child);
 		child.parent = this;
 		layer.add(child.layer());
+		if (scene != null) child.setScene(scene);
 	}
 	
 	public boolean removeChild(GameObject child) {

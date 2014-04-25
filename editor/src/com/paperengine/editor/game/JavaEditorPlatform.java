@@ -92,10 +92,8 @@ public class JavaEditorPlatform extends JavaPlatform {
 			// Sleep until it's time for the next frame.
 			Display.sync(60);
 		}
-		System.out.println("!");
 
 		shutdown();
-		System.out.println("!!");
 	}
 	
 	protected void shutdown() {

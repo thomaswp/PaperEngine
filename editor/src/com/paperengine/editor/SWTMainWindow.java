@@ -11,8 +11,6 @@ import org.eclipse.swt.awt.SWT_AWT;
 import org.eclipse.swt.custom.SashForm;
 import org.eclipse.swt.custom.ScrolledComposite;
 import org.eclipse.swt.events.MouseAdapter;
-import org.eclipse.swt.events.SelectionEvent;
-import org.eclipse.swt.events.SelectionListener;
 import org.eclipse.swt.graphics.Point;
 import org.eclipse.swt.layout.FillLayout;
 import org.eclipse.swt.layout.GridData;
@@ -27,10 +25,12 @@ import org.eclipse.swt.widgets.Shell;
 
 import com.paperengine.core.Editor;
 import com.paperengine.core.GameObject;
+import com.paperengine.core.Scene;
+import com.paperengine.editor.ObjectTree.ObjectSelectedListener;
 import com.paperengine.editor.editor.ObjectEditor;
 
 
-public class SWTMainWindow {
+public class SWTMainWindow implements ObjectSelectedListener {
 
 	private Display display;
 	private GameCanvas gameCanvas;
@@ -41,6 +41,10 @@ public class SWTMainWindow {
 	private ObjectEditor objectEditor;
 	private Frame awtFrame;
 	
+	public Scene scene() {
+		return gameCanvas.scene();
+	}
+	
 	public static void main(String[] args) {
 		
 		SWTMainWindow window = new SWTMainWindow();
@@ -48,6 +52,10 @@ public class SWTMainWindow {
 	}
 
 	private void togglePlay() {
+		if (!Editor.playing) {
+			gameCanvas.pushScene();
+			objectTree.setScene(gameCanvas.scene());
+		}
 		Editor.playing = !Editor.playing;
 		updatePlayText();
 		if (Editor.paused) {
@@ -57,7 +65,7 @@ public class SWTMainWindow {
 			toggleView();
 		}
 		if (!Editor.playing) {
-			gameCanvas.resetGame();
+			gameCanvas.popScene();
 			objectTree.setScene(gameCanvas.scene());
 		}
 	}
@@ -71,12 +79,11 @@ public class SWTMainWindow {
 	}
 	
 	private void togglePause() {
+		if (!Editor.paused && !Editor.playing) {
+			togglePlay();
+		}
 		Editor.paused = !Editor.paused;
 		updatePauseText();
-		if (Editor.paused && !Editor.playing) {
-			Editor.playing = true;
-			updatePlayText();
-		}
 	}
 
 	private void updatePauseText() {
@@ -100,8 +107,8 @@ public class SWTMainWindow {
 		}
 	}
 
-	
-	private void gameObjectSelected(GameObject object) {
+	@Override
+	public void onObjectSelected(GameObject object) {
 		objectEditor.loadObject(object);
 	}
 	
@@ -184,17 +191,6 @@ public class SWTMainWindow {
 		objectTree = new ObjectTree(scrolledCompositeObjectTree, SWT.BORDER);
 		scrolledCompositeObjectTree.setContent(objectTree.tree());
 		scrolledCompositeObjectTree.setMinSize(objectTree.tree().computeSize(SWT.DEFAULT, SWT.DEFAULT));
-		objectTree.tree().addSelectionListener(new SelectionListener() {
-			@Override
-			public void widgetSelected(SelectionEvent event) {
-				gameObjectSelected((GameObject) event.item.getData());
-			}
-
-			@Override
-			public void widgetDefaultSelected(SelectionEvent event) {
-				gameObjectSelected(null);
-			}
-		});
 		
 		final Composite composite = new Composite(sashFormHorizontal, SWT.EMBEDDED);
 		composite.setDragDetect(false);
@@ -249,12 +245,13 @@ public class SWTMainWindow {
 				display.sleep();
 			}
 		}
-		gameCanvas.dispose();
 		display.dispose();
+		gameCanvas.dispose();
 	}
 
 	public void start() {
 		objectTree.setScene(gameCanvas.scene());
+		objectTree.setListener(this);
 	}
 	
 	public void update() {
@@ -283,4 +280,5 @@ public class SWTMainWindow {
                 event.time, modifiers, event.x, event.y, 1, false, button);
         return awtMouseEvent;
     }
+
 }

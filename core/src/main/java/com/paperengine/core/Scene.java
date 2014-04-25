@@ -1,7 +1,6 @@
 package com.paperengine.core;
 
 import static playn.core.PlayN.graphics;
-import static playn.core.PlayN.mouse;
 
 import java.io.Serializable;
 import java.util.ArrayList;
@@ -22,7 +21,9 @@ public class Scene implements IUpdatable, Listener, Serializable {
 	private static final long serialVersionUID = 1L;
 	
 	private List<GameObject> gameObjects = new ArrayList<GameObject>();
+	private List<GameObject> allGameObjects = new ArrayList<GameObject>();
 	private GroupLayer layer; 
+	private int nextObjectId = 0;
 	
 	private boolean editorMouseDown;
 	private Transform editorTransform = new Transform();
@@ -37,10 +38,10 @@ public class Scene implements IUpdatable, Listener, Serializable {
 	
 	public Scene() {
 		layer = graphics().createGroupLayer();
-		mouse().setListener(this);
 	}
 	
 	public void addGameObject(GameObject gameObject) {
+		if (gameObjects.contains(gameObject)) return;
 		for (int i = 0; i <= gameObjects.size(); i++) {
 			if (i == gameObjects.size() || gameObjects.get(i).depth() > gameObject.depth()) {
 				gameObjects.add(i, gameObject);
@@ -48,6 +49,20 @@ public class Scene implements IUpdatable, Listener, Serializable {
 			}
 		}
 		layer.add(gameObject.layer());
+		gameObject.setScene(this);
+	}
+
+	protected int registerGameObject(GameObject gameObject) {
+		if (allGameObjects.contains(gameObject)) return gameObject.id();
+		allGameObjects.add(gameObject);
+		return nextObjectId++;
+	}
+	
+	public GameObject getObjectById(int id) {
+		for (GameObject object : allGameObjects) {
+			if (object.id() == id) return object;
+		}
+		return null;
 	}
 	
 	public void update(float delta) {
