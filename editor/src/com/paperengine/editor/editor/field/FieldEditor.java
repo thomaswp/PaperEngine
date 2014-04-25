@@ -1,52 +1,54 @@
 package com.paperengine.editor.editor.field;
 
-import java.lang.reflect.Field;
+import java.lang.reflect.Type;
 
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.widgets.Composite;
 
-import com.paperengine.core.Component;
+import pythagoras.f.Point;
+
 import com.paperengine.core.Editor;
 import com.paperengine.core.Scene;
 
 public abstract class FieldEditor<T> extends Composite {
 	
-	protected Component component;
-	protected Field field;
+	protected Accessor accessor;
 	private boolean wasPlaying;
 	
-	public FieldEditor(Composite parent, Component component, Field field) {
+	public FieldEditor(Composite parent, Accessor accessor) {
 		super(parent, SWT.NONE);
-		this.component = component;
-		this.field = field;
+		this.accessor = accessor;
 	}
 	
-	public static FieldEditor<?> create(Composite parent, Component component, Field field) {
-		if (field.getType() == float.class || field.getType() == Float.class) {
-			return new FloatFieldEditor(parent, component, field); 
+	public static FieldEditor<?> create(Composite parent, Accessor accessor) {
+		Type type = accessor.type();
+		if (type == float.class || type == Float.class) {
+			return new FloatFieldEditor(parent, accessor); 
+		} else if (type == int.class || type == Integer.class) {
+			return new IntegerFieldEditor(parent, accessor); 
+		} else if (type == Point.class) {
+			return new PointFieldEditor(parent, accessor); 
 		}
 		return null;
 	}
 
 	public void update(Scene scene) {
 		if (wasPlaying || Editor.playing) {
-			updateField(scene);
+			updateField();
 		}
 		wasPlaying = Editor.playing;
 	}
 	
-	protected void updateField(Scene scene) {
-		
+	protected void updateField() {
 	}
 	
 	@SuppressWarnings("unchecked")
 	protected T getValue() {
-		try {
-			return (T) field.get(component);
-		} catch (Exception e) {
-			e.printStackTrace();
-		}
-		return null;
+		return (T) accessor.get();
+	}
+	
+	protected void setValue(T value) {
+		accessor.set(value);
 	}
 	
 	public static String humanReadableField(String name) {
@@ -55,12 +57,12 @@ public abstract class FieldEditor<T> extends Composite {
 		for (char c : name.toCharArray()) {
 			if (!Character.isLowerCase(c) && hName.length() > 0) {
 				hName += " " + c;
-				capitalize = true;
 			} else if (capitalize) {
 				hName += Character.toUpperCase(c);
 				capitalize = false;
 			} else {
 				hName += c;
+				capitalize = false;
 			}
 		}
 		return hName;
