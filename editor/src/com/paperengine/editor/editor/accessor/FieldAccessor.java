@@ -1,4 +1,4 @@
-package com.paperengine.editor.editor.field;
+package com.paperengine.editor.editor.accessor;
 
 import java.lang.reflect.Field;
 import java.lang.reflect.Modifier;
@@ -6,9 +6,11 @@ import java.lang.reflect.Type;
 import java.util.ArrayList;
 import java.util.List;
 
+import pythagoras.f.Point;
+
 public class FieldAccessor implements Accessor {
-	private final Field field;
-	private final Object object;
+	protected final Field field;
+	protected final Object object;
 	
 	public FieldAccessor(Field field, Object object) {
 		this.field = field;
@@ -48,10 +50,20 @@ public class FieldAccessor implements Accessor {
 		ArrayList<FieldAccessor> accessors = new ArrayList<FieldAccessor>();
 		Field[] fields = object.getClass().getFields();
 		for (Field field : fields) {
-			if ((Modifier.isPublic(field.getModifiers())) && !Modifier.isFinal(field.getModifiers())) {
-				accessors.add(new FieldAccessor(field, object));
+			if (Modifier.isPublic(field.getModifiers())) {
+				Type type = field.getType();
+				if (type == Point.class) {
+					accessors.add(new PointAccessor(field, object));
+				} else if (!Modifier.isFinal(field.getModifiers())) {
+					accessors.add(new FieldAccessor(field, object));
+				}
 			}
 		}
 		return accessors;
+	}
+
+	@Override
+	public Accessor copyForObject(Object object) {
+		return new FieldAccessor(field, object);
 	}
 }

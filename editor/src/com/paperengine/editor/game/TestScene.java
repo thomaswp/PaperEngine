@@ -19,14 +19,16 @@ public class TestScene extends Scene {
 		camera.setName("Camera");
 		
 		GameObject obj = new GameObject();
-		ShapeRenderer renderer = new ShapeRenderer(ShapeType.Circle, 100, 100, Colors.BLUE, Colors.WHITE, 4, 0);
+		ShapeRenderer renderer = new ShapeRenderer();
+		renderer.set(ShapeType.Circle, 100, 100, Colors.BLUE, Colors.WHITE, 4, 0);
 		renderer.setOrigin(50, 50);
 		obj.addComponent(renderer);
 		obj.addComponent(new Circulator());
 		obj.setName("Circle");
 		
 		GameObject child = new GameObject();
-		ShapeRenderer childRenderer = new ShapeRenderer(ShapeType.Rectangle, 50, 50, Colors.RED, Colors.WHITE, 2, 0);
+		ShapeRenderer childRenderer = new ShapeRenderer();
+		childRenderer.set(ShapeType.Rectangle, 50, 50, Colors.RED, Colors.WHITE, 2, 0);
 		childRenderer.setOrigin(25, 25);
 		child.addComponent(childRenderer);
 		child.addComponent(new Circulator());

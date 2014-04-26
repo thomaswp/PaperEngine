@@ -2,6 +2,8 @@ package com.paperengine.editor.editor.field;
 
 import org.eclipse.swt.widgets.Composite;
 
+import com.paperengine.editor.editor.accessor.Accessor;
+
 public class FloatFieldEditor extends NumberFieldEditor<Float> {
 	
 	public FloatFieldEditor(Composite parent, Accessor accessor) {

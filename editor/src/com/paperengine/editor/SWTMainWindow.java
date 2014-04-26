@@ -223,6 +223,7 @@ public class SWTMainWindow implements ObjectSelectedListener {
 		
 		objectEditor = new ObjectEditor(scrolledCompositeObjectEditor, SWT.NONE);
 		RowLayout rl_objectEditor = new RowLayout(SWT.VERTICAL);
+		rl_objectEditor.wrap = false;
 		rl_objectEditor.fill = true;
 		objectEditor.setLayout(rl_objectEditor);
 		

@@ -9,6 +9,8 @@ public abstract class Component implements IUpdatable, Postable {
 	protected GameObject gameObject;
 	private final Handler handler = new Handler();
 	
+	protected Component() { }
+	
 	public Handler handler() {
 		return handler;
 	}

@@ -63,21 +63,21 @@ public class ShapeRenderer extends CanvasRenderer {
 		this.padding = padding;
 		refreshImage();
 	}
-
-	public ShapeRenderer(ShapeType shapeType, float width, float height, int color, int borderColor,
+	
+	public void set(ShapeType shapeType, float width, float height, int color, int borderColor,
 			float borderWidth, float padding) {
-		super(width, height);
 		this.shapeType = shapeType;
 		this.color = color;
 		this.borderColor = borderColor;
 		this.borderWidth = borderWidth;
 		this.padding = padding;
-		refreshImage();
+		setSize(width, height);
 	}
 
 	@Override
 	protected Image createImage(float width, float height) {
 		if (shapeType == null) return null;
+		if (width <= 0 || height <= 0) return null;
 		
 		CanvasImage image = PlayN.graphics().createImage(width, height);
 		Canvas canvas = image.canvas();

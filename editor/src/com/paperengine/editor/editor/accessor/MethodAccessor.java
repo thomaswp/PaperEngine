@@ -1,4 +1,4 @@
-package com.paperengine.editor.editor.field;
+package com.paperengine.editor.editor.accessor;
 
 import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
@@ -90,5 +90,10 @@ public class MethodAccessor implements Accessor {
 			accessors.add(new MethodAccessor(name, getter, setter, object));
 		}
 		return accessors;
+	}
+
+	@Override
+	public Accessor copyForObject(Object object) {
+		return new MethodAccessor(name, getter, setter, (Postable) object);
 	}
 }

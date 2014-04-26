@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.eclipse.swt.SWT;
+import org.eclipse.swt.custom.ScrolledComposite;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Text;
 
@@ -41,6 +42,10 @@ public class ObjectEditor extends Composite {
 			}
 		}
 		
+		Composite parent = getParent();
+		if (parent instanceof ScrolledComposite) {
+			((ScrolledComposite) parent).setMinSize(computeSize(SWT.DEFAULT, SWT.DEFAULT));
+		}
 		this.layout();
 	}
 

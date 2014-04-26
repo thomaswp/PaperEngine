@@ -2,6 +2,8 @@ package com.paperengine.editor.editor.field;
 
 import org.eclipse.swt.widgets.Composite;
 
+import com.paperengine.editor.editor.accessor.Accessor;
+
 public class IntegerFieldEditor extends NumberFieldEditor<Integer> {
 
 	public IntegerFieldEditor(Composite parent, Accessor accessor) {

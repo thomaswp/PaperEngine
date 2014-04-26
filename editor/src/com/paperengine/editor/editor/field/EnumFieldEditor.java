@@ -9,6 +9,7 @@ import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Label;
 
 import com.paperengine.core.Editor;
+import com.paperengine.editor.editor.accessor.Accessor;
 
 public class EnumFieldEditor extends FieldEditor<Enum<?>> {
 

@@ -15,6 +15,7 @@ import playn.java.JavaPlatform;
 import com.paperengine.core.PaperGame;
 import com.paperengine.core.Scene;
 import com.paperengine.editor.game.JavaEditorPlatform;
+import com.paperengine.editor.game.SceneSerializer;
 import com.paperengine.editor.game.TestScene;
 
 public class GameCanvas extends Canvas {
@@ -99,9 +100,9 @@ public class GameCanvas extends Canvas {
 
 	public void pushScene() {
 		sceneStack.add(0, scene);
-		setScene(new TestScene());
+		setScene(SceneSerializer.copy(scene));
 	}
-	
+
 	public void popScene() {
 		setScene(sceneStack.remove(0));
 	}

@@ -7,9 +7,9 @@ import org.eclipse.swt.widgets.Composite;
 
 import com.paperengine.core.Component;
 import com.paperengine.core.Scene;
-import com.paperengine.editor.editor.field.FieldAccessor;
+import com.paperengine.editor.editor.accessor.FieldAccessor;
+import com.paperengine.editor.editor.accessor.MethodAccessor;
 import com.paperengine.editor.editor.field.FieldEditor;
-import com.paperengine.editor.editor.field.MethodAccessor;
 
 public class DefaultComponentEditor extends ComponentEditor<Component> {
 

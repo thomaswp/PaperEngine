@@ -1,4 +1,4 @@
-package com.paperengine.editor.editor.field;
+package com.paperengine.editor.editor.accessor;
 
 import java.lang.reflect.Type;
 
@@ -8,4 +8,5 @@ public interface Accessor {
 	void set(Object value);
 	String name();
 	Type type();
+	Accessor copyForObject(Object object);
 }

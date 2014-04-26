@@ -11,6 +11,7 @@ import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Text;
 
 import com.paperengine.core.Editor;
+import com.paperengine.editor.editor.accessor.Accessor;
 
 public abstract class NumberFieldEditor<T> extends FieldEditor<T> {
 

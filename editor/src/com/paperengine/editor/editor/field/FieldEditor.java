@@ -9,6 +9,7 @@ import pythagoras.f.Point;
 
 import com.paperengine.core.Editor;
 import com.paperengine.core.Scene;
+import com.paperengine.editor.editor.accessor.Accessor;
 
 public abstract class FieldEditor<T> extends Composite {
 	
@@ -26,12 +27,14 @@ public abstract class FieldEditor<T> extends Composite {
 			return new FloatFieldEditor(parent, accessor); 
 		} else if (type == int.class || type == Integer.class) {
 			return new IntegerFieldEditor(parent, accessor); 
+		} else if (type == boolean.class || type == Boolean.class) {
+			return new BooleanFieldEditor(parent, accessor); 
 		} else if (type == Point.class) {
 			return new PointFieldEditor(parent, accessor); 
 		} else if (type instanceof Class<?> && ((Class<?>) type).isEnum()) {
 			return new EnumFieldEditor(parent, accessor);
 		} else {
-			System.out.println("No editor for: " + type.getClass());
+			System.out.println("No editor for: " + type.toString());
 		}
 		return null;
 	}

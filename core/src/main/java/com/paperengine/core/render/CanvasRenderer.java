@@ -22,9 +22,8 @@ public abstract class CanvasRenderer extends Renderer {
 	
 	protected abstract Image createImage(float width, float height);
 	
-	public CanvasRenderer(float width, float height) {
+	public CanvasRenderer() {
 		layer = graphics().createImageLayer();
-		setSize(width, height);
 	}
 	
 	

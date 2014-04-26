@@ -223,6 +223,12 @@ public class GameObject implements IUpdatable {
 		layer.setRotation(transform.rotation);
 		layer.setScaleX(transform.scaleX);
 		layer.setScaleY(transform.scaleY);
-		
+	}
+	
+	public GameObject shallowCopy() {
+		GameObject copy = new GameObject();
+		copy.enabled = enabled;
+		copy.name = name;
+		return copy;
 	}
 }

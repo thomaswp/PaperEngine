@@ -41,6 +41,14 @@ public abstract class Renderer extends Component {
 		layer().setOrigin(x, y);
 	}
 	
+	public void setOriginX(float x) {
+		setOrigin(x, originY());
+	}
+	
+	public void setOriginY(float y) {
+		setOrigin(originX(), y);
+	}
+	
 	public abstract Layer layer();
 
 }

@@ -15,7 +15,10 @@ public abstract class ComponentEditor<T extends Component> extends Composite {
 	
 	public ComponentEditor(Composite parent, T component) {
 		super(parent, SWT.BORDER);
-		setLayout(new RowLayout(SWT.VERTICAL));
+		RowLayout layout = new RowLayout(SWT.VERTICAL);
+		layout.fill = true;
+		layout.spacing = 1;
+		setLayout(layout);
 		this.component = component;
 		
 		nameLabel = new Label(this, SWT.NONE);
