@@ -7,15 +7,15 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 
-import playn.java.JavaPlatform.Config;
+import com.paperengine.core.Handler.Postable;
 
 public class MethodAccessor implements Accessor {
 
 	private final Method getter, setter;
-	private final Object object;
+	private final Postable object;
 	private final String name;
-	
-	public MethodAccessor(String name, Method getter, Method setter, Object object) {
+
+	public MethodAccessor(String name, Method getter, Method setter, Postable object) {
 		this.name = name;
 		this.getter = getter;
 		this.setter = setter;
@@ -24,7 +24,7 @@ public class MethodAccessor implements Accessor {
 			throw new RuntimeException("Type Missmatch!");
 		}
 	}
-	
+
 	@Override
 	public Object get() {
 		try {
@@ -36,12 +36,17 @@ public class MethodAccessor implements Accessor {
 	}
 
 	@Override
-	public void set(Object value) {
-		try {
-			setter.invoke(object, value);
-		} catch (Exception e) {
-			e.printStackTrace();
-		}
+	public void set(final Object value) {
+		object.handler().post(new Runnable() {
+			@Override
+			public void run() {
+				try {
+					setter.invoke(object, value);
+				} catch (Exception e) {
+					e.printStackTrace();
+				}
+			}
+		});
 	}
 
 	@Override
@@ -54,7 +59,7 @@ public class MethodAccessor implements Accessor {
 		return getter.getReturnType();
 	}
 
-	public static List<MethodAccessor> getForObject(Object object) {
+	public static List<MethodAccessor> getForObject(Postable object) {
 		List<MethodAccessor> accessors = new ArrayList<MethodAccessor>();
 		HashMap<String, Method> getters = new HashMap<String, Method>();
 		HashMap<String, Method> setters = new HashMap<String, Method>();
@@ -72,16 +77,16 @@ public class MethodAccessor implements Accessor {
 				getters.put(Character.toUpperCase(name.charAt(0)) + name.substring(1), method);
 			}
 		}
-		
+
 		for (String name : getters.keySet()) {
 			Method setter = setters.get(name);
 			if (setter == null || setter.getReturnType() != void.class) continue;
 			Method getter = getters.get(name);
-			
+
 			Type type = getter.getReturnType();
 			Class<?>[] parameterTypes = setter.getParameterTypes();
 			if (parameterTypes.length != 1 || parameterTypes[0] != type) continue;
-			
+
 			accessors.add(new MethodAccessor(name, getter, setter, object));
 		}
 		return accessors;

@@ -1,5 +1,6 @@
 package com.paperengine.core;
 
+
 public class Editor {
 	public static boolean playing = true;
 	public static boolean paused;

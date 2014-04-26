@@ -28,6 +28,10 @@ public abstract class FieldEditor<T> extends Composite {
 			return new IntegerFieldEditor(parent, accessor); 
 		} else if (type == Point.class) {
 			return new PointFieldEditor(parent, accessor); 
+		} else if (type instanceof Class<?> && ((Class<?>) type).isEnum()) {
+			return new EnumFieldEditor(parent, accessor);
+		} else {
+			System.out.println("No editor for: " + type.getClass());
 		}
 		return null;
 	}

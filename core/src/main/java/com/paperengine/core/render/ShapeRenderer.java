@@ -88,7 +88,7 @@ public class ShapeRenderer extends CanvasRenderer {
 		
 		canvas.setFillColor(color);
 		switch (shapeType) {
-		case Circle: canvas.fillCircle(w / 2, h / 2, minWH / 2); break;
+		case Circle: canvas.fillCircle(width / 2, height / 2, minWH / 2); break;
 		case Rectangle: canvas.fillRect(padding, padding, w, h); break;
 		case RoundRectangle: canvas.fillRoundRect(
 				padding, padding, w, h, roundRectRadius); break;

@@ -5,6 +5,9 @@ import java.awt.Frame;
 import java.awt.Panel;
 import java.awt.event.InputEvent;
 import java.awt.event.MouseEvent;
+import java.util.Collections;
+import java.util.LinkedList;
+import java.util.List;
 
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.awt.SWT_AWT;
@@ -25,6 +28,8 @@ import org.eclipse.swt.widgets.Shell;
 
 import com.paperengine.core.Editor;
 import com.paperengine.core.GameObject;
+import com.paperengine.core.Handler;
+import com.paperengine.core.Handler.ListProvider;
 import com.paperengine.core.Scene;
 import com.paperengine.editor.ObjectTree.ObjectSelectedListener;
 import com.paperengine.editor.editor.ObjectEditor;
@@ -115,6 +120,12 @@ public class SWTMainWindow implements ObjectSelectedListener {
 	public void open() {
 		Editor.playing = false;
 		Editor.viewingEditor = true;
+		Handler.listProvider = new ListProvider() {
+			@Override
+			public <T> List<T> createList() {
+				return Collections.synchronizedList(new LinkedList<T>());
+			}
+		};
 		
 		display = Display.getDefault();
 		Shell shell = new Shell();
@@ -254,9 +265,16 @@ public class SWTMainWindow implements ObjectSelectedListener {
 		objectTree.setListener(this);
 	}
 	
+	public final static int FPS = 10;
+	private long lastUpdate = System.currentTimeMillis();
+	
 	public void update() {
-		objectTree.update(gameCanvas.scene());
-		objectEditor.update(gameCanvas.scene());
+		long elapsed = System.currentTimeMillis() - lastUpdate;
+		if (elapsed > 1000 / FPS) {
+			lastUpdate += elapsed;
+			objectTree.update(gameCanvas.scene());
+			objectEditor.update(gameCanvas.scene());
+		}
 	}
 	
 	public static MouseEvent toAwtMouseEvent(org.eclipse.swt.events.MouseEvent event, Component compoment) {
