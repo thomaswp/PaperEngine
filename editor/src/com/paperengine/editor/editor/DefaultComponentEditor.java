@@ -1,19 +1,16 @@
 package com.paperengine.editor.editor;
 
-import java.util.ArrayList;
 import java.util.List;
 
 import org.eclipse.swt.widgets.Composite;
 
 import com.paperengine.core.Component;
-import com.paperengine.core.Scene;
 import com.paperengine.editor.editor.accessor.FieldAccessor;
 import com.paperengine.editor.editor.accessor.MethodAccessor;
 import com.paperengine.editor.editor.field.FieldEditor;
 
 public class DefaultComponentEditor extends ComponentEditor<Component> {
 
-	private List<FieldEditor<?>> editors = new ArrayList<FieldEditor<?>>();
 	
 	public DefaultComponentEditor(Composite parent, Component component) {
 		super(parent, component);
@@ -32,13 +29,6 @@ public class DefaultComponentEditor extends ComponentEditor<Component> {
 			if (editor != null) {
 				editors.add(editor);
 			}
-		}
-	}
-
-	@Override
-	public void update(Scene scene) {
-		for (FieldEditor<?> editor : editors) {
-			editor.update(scene);
 		}
 	}
 }

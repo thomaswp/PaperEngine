@@ -1,5 +1,8 @@
 package com.paperengine.editor.editor;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.layout.RowLayout;
 import org.eclipse.swt.widgets.Composite;
@@ -7,11 +10,13 @@ import org.eclipse.swt.widgets.Label;
 
 import com.paperengine.core.Component;
 import com.paperengine.core.Scene;
+import com.paperengine.editor.editor.field.FieldEditor;
 
 public abstract class ComponentEditor<T extends Component> extends Composite {
 	
 	protected T component;
 	protected Label nameLabel;
+	protected List<FieldEditor<?>> editors = new ArrayList<FieldEditor<?>>();
 	
 	public ComponentEditor(Composite parent, T component) {
 		super(parent, SWT.BORDER);
@@ -30,7 +35,16 @@ public abstract class ComponentEditor<T extends Component> extends Composite {
 	}
 
 	public void update(Scene scene) {
-		
+		FieldEditor<?> modified = null;
+		for (FieldEditor<?> editor : editors) {
+			if (editor.popModified()) modified = editor;
+		}
+		for (FieldEditor<?> editor : editors) {
+			editor.update(scene);
+			if (modified != null && editor != modified) {
+				editor.updateField();
+			}
+		}
 	}
 
 }

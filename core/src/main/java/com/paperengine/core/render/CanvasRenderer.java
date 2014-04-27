@@ -5,7 +5,7 @@ import playn.core.Image;
 import playn.core.ImageLayer;
 import playn.core.Layer;
 
-public abstract class CanvasRenderer extends Renderer {
+public abstract class CanvasRenderer extends SizedRenderer {
 
 	private ImageLayer layer;
 	

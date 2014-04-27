@@ -46,12 +46,12 @@ public class PointFieldEditor extends FieldEditor<Point> {
 			}
 		});
 		
-		updateField();
+		updateFieldLocal();
 	}
 
 	@Override
-	public void updateField() {
-		super.updateField();
+	public void updateFieldLocal() {
+		super.updateFieldLocal();
 		Point value = getValue();
 		textX.setEnabled(!Editor.playing);
 		textY.setEnabled(!Editor.playing);

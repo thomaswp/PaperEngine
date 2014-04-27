@@ -15,6 +15,14 @@ public abstract class FieldEditor<T> extends Composite {
 	
 	protected Accessor accessor;
 	private boolean wasPlaying;
+	private boolean modified;
+	private boolean updatingField;
+	
+	public boolean popModified() {
+		boolean m = modified;
+		modified = false;
+		return m;
+	}
 	
 	public FieldEditor(Composite parent, Accessor accessor) {
 		super(parent, SWT.NONE);
@@ -46,7 +54,13 @@ public abstract class FieldEditor<T> extends Composite {
 		wasPlaying = Editor.playing;
 	}
 	
-	protected void updateField() {
+	protected void updateFieldLocal() {
+	}
+	
+	public final void updateField() {
+		updatingField = true;
+		updateFieldLocal();
+		updatingField = false;
 	}
 	
 	@SuppressWarnings("unchecked")
@@ -55,7 +69,12 @@ public abstract class FieldEditor<T> extends Composite {
 	}
 	
 	protected void setValue(T value) {
+		Object v = accessor.get();
+		if (v == value) return;
 		accessor.set(value);
+		if (!updatingField) {
+			modified = true;
+		}
 	}
 	
 	public static String humanReadableField(String name) {

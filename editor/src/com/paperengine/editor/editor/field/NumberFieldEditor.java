@@ -57,7 +57,7 @@ public abstract class NumberFieldEditor<T> extends FieldEditor<T> {
 	}
 
 	@Override
-	public void updateField() {
+	public void updateFieldLocal() {
 		textValue.setEnabled(!Editor.playing);
 		textValue.setText(getText());
 	}

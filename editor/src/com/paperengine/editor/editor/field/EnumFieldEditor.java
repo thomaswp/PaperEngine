@@ -61,7 +61,7 @@ public class EnumFieldEditor extends FieldEditor<Enum<?>> {
 	}
 	
 	@Override
-	public void updateField() {
+	public void updateFieldLocal() {
 		comboValue.setEnabled(!Editor.playing);
 		comboValue.select(getIndex());
 	}

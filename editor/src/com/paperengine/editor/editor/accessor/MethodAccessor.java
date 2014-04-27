@@ -61,24 +61,27 @@ public class MethodAccessor implements Accessor {
 
 	public static List<MethodAccessor> getForObject(Postable object) {
 		List<MethodAccessor> accessors = new ArrayList<MethodAccessor>();
+		ArrayList<String> getterNames = new ArrayList<String>();
 		HashMap<String, Method> getters = new HashMap<String, Method>();
 		HashMap<String, Method> setters = new HashMap<String, Method>();
 		Method[] methods = object.getClass().getMethods();
 		for (Method method : methods) {
 			if (!Modifier.isPublic(method.getModifiers())) continue;
 			String name = method.getName();
+			String getterName = null;
 			if (name.startsWith("get")) {
-				getters.put(name.substring(3), method);
+				getters.put(getterName = name.substring(3), method);
 			} else if (name.startsWith("is")) {
-				getters.put(name.substring(2), method);
+				getters.put(getterName = name.substring(2), method);
 			} else if (name.startsWith("set")) {
 				setters.put(name.substring(3), method);
 			} else {
-				getters.put(Character.toUpperCase(name.charAt(0)) + name.substring(1), method);
+				getters.put(getterName = Character.toUpperCase(name.charAt(0)) + name.substring(1), method);
 			}
+			if (getterName != null) getterNames.add(getterName);
 		}
 
-		for (String name : getters.keySet()) {
+		for (String name : getterNames) {
 			Method setter = setters.get(name);
 			if (setter == null || setter.getReturnType() != void.class) continue;
 			Method getter = getters.get(name);

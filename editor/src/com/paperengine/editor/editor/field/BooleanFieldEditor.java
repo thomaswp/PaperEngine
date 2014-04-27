@@ -28,11 +28,11 @@ public class BooleanFieldEditor extends FieldEditor<Boolean> {
 			}
 		});
 		
-		updateField();
+		updateFieldLocal();
 	}
 	
 	@Override
-	public void updateField() {
+	public void updateFieldLocal() {
 		buttonValue.setEnabled(!Editor.playing);
 		buttonValue.setSelection(getValue());
 	}
