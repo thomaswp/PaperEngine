@@ -10,7 +10,6 @@ import org.eclipse.swt.widgets.Text;
 
 import pythagoras.f.Point;
 
-import com.paperengine.core.Editor;
 import com.paperengine.editor.editor.accessor.Accessor;
 
 public class PointFieldEditor extends FieldEditor<Point> {
@@ -53,8 +52,6 @@ public class PointFieldEditor extends FieldEditor<Point> {
 	public void updateFieldLocal() {
 		super.updateFieldLocal();
 		Point value = getValue();
-		textX.setEnabled(!Editor.playing);
-		textY.setEnabled(!Editor.playing);
 		textX.setText(format(value.x));
 		textY.setText(format(value.y));
 	}
@@ -64,6 +61,11 @@ public class PointFieldEditor extends FieldEditor<Point> {
 	}
 	
 	private void set() {
+		setValue(getUI());
+	}
+
+	@Override
+	protected Point getUI() {
 		Point point = getValue();
 		try {
 			point.x = Float.parseFloat(textX.getText());
@@ -71,7 +73,12 @@ public class PointFieldEditor extends FieldEditor<Point> {
 		try {
 			point.y = Float.parseFloat(textY.getText());
 		} catch (Exception e) { }
-		setValue(point);
+		return point;
 	}
 
+	@Override
+	protected void setEnabledLocal(boolean enabled) {
+		textX.setEnabled(enabled);
+		textY.setEnabled(enabled);
+	}
 }

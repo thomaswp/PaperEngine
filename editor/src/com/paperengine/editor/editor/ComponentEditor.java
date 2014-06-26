@@ -35,15 +35,9 @@ public abstract class ComponentEditor<T extends Component> extends Composite {
 	}
 
 	public void update(Scene scene) {
-		FieldEditor<?> modified = null;
-		for (FieldEditor<?> editor : editors) {
-			if (editor.popModified()) modified = editor;
-		}
 		for (FieldEditor<?> editor : editors) {
 			editor.update(scene);
-			if (modified != null && editor != modified) {
-				editor.updateField();
-			}
+			editor.updateField();
 		}
 	}
 

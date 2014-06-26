@@ -21,10 +21,8 @@ public class JavaEditorPlatform extends JavaPlatform {
 	boolean resize;
 	int width, height;
 	boolean dispose;
-
-	public void dispose() {
-		dispose = true;
-	}
+	private boolean wasActive;
+	private Game game;
 
 	/**
 	 * Registers the Java platform with the specified configuration.
@@ -69,46 +67,33 @@ public class JavaEditorPlatform extends JavaPlatform {
 
 	@Override
 	public void run(final Game game) {
+		this.game = game;
 		try {
 			Display.create();
 		} catch (LWJGLException e) {
 			throw new RuntimeException(e);
 		}
 		init(game);
-
-		boolean wasActive = Display.isActive();
-		while (!Display.isCloseRequested() && !dispose) {
-			// Notify the app if lose or regain focus (treat said as pause/resume).
-			boolean newActive = Display.isActive();
-			if (wasActive != newActive) {
-				if (wasActive)
-					onPause();
-				else
-					onResume();
-				wasActive = newActive;
-			}
-			processFrame(game);
-			Display.update();
-			// Sleep until it's time for the next frame.
-			Display.sync(60);
-		}
-
-		shutdown();
+		wasActive = Display.isActive();
 	}
 	
-	protected void shutdown() {
-		// let the game run any of its exit hooks
-		onExit();
-
-		// shutdown our thread pool
-//		try {
-//			_exec.shutdown();
-//			_exec.awaitTermination(1, TimeUnit.SECONDS);
-//		} catch (InterruptedException ie) {
-//			// nothing to do here except go ahead and exit
-//		}
-
-		// and finally stick a fork in the JVM
-		System.exit(0);
+	public void update() {
+		// Notify the app if lose or regain focus (treat said as pause/resume).
+		boolean newActive = Display.isActive();
+		if (wasActive != newActive) {
+			if (wasActive)
+				onPause();
+			else
+				onResume();
+			wasActive = newActive;
+		}
+		processFrame(game);
+		Display.update();
+		// Sleep until it's time for the next frame.
+		Display.sync(60);
+	}
+	
+	public void shutdown() {
+		super.shutdown();
 	}
 }

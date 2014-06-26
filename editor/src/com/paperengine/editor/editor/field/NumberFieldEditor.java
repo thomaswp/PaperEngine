@@ -10,7 +10,6 @@ import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Text;
 
-import com.paperengine.core.Editor;
 import com.paperengine.editor.editor.accessor.Accessor;
 
 public abstract class NumberFieldEditor<T> extends FieldEditor<T> {
@@ -58,9 +57,12 @@ public abstract class NumberFieldEditor<T> extends FieldEditor<T> {
 
 	@Override
 	public void updateFieldLocal() {
-		textValue.setEnabled(!Editor.playing);
+		if (textValue.isFocusControl()) return;
 		textValue.setText(getText());
 	}
 	
-
+	@Override
+	protected void setEnabledLocal(boolean enabled) {
+		textValue.setEnabled(enabled);
+	}
 }

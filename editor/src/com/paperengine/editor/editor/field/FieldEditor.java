@@ -8,24 +8,24 @@ import org.eclipse.swt.widgets.Composite;
 import pythagoras.f.Point;
 
 import com.paperengine.core.Editor;
+import com.paperengine.core.Handler;
 import com.paperengine.core.Scene;
+import com.paperengine.core.Handler.Postable;
 import com.paperengine.editor.editor.accessor.Accessor;
 
-public abstract class FieldEditor<T> extends Composite {
+public abstract class FieldEditor<T> extends Composite implements Postable {
 	
+	protected Handler handler;
 	protected Accessor accessor;
 	private boolean wasPlaying;
-	private boolean modified;
-	private boolean updatingField;
-	
-	public boolean popModified() {
-		boolean m = modified;
-		modified = false;
-		return m;
-	}
+	private boolean setting, getting;
+
+	protected abstract T getUI();
+	protected abstract void setEnabledLocal(boolean enabled);
 	
 	public FieldEditor(Composite parent, Accessor accessor) {
 		super(parent, SWT.NONE);
+		handler = new Handler();
 		this.accessor = accessor;
 	}
 	
@@ -48,6 +48,8 @@ public abstract class FieldEditor<T> extends Composite {
 	}
 
 	public void update(Scene scene) {
+		handler.update();
+		setEnabledLocal(Editor.canEdit());
 		if (wasPlaying || Editor.playing) {
 			updateField();
 		}
@@ -58,9 +60,10 @@ public abstract class FieldEditor<T> extends Composite {
 	}
 	
 	public final void updateField() {
-		updatingField = true;
+		if (setting || accessor.sameAs(getUI())) return;
+		getting = true;
 		updateFieldLocal();
-		updatingField = false;
+		getting = false;
 	}
 	
 	@SuppressWarnings("unchecked")
@@ -69,12 +72,22 @@ public abstract class FieldEditor<T> extends Composite {
 	}
 	
 	protected void setValue(T value) {
-		Object v = accessor.get();
-		if (v == value) return;
-		accessor.set(value);
-		if (!updatingField) {
-			modified = true;
-		}
+		if (getting || accessor.sameAs(value)) return;
+		System.out.println("Set: " + value);
+		setting = true;
+		accessor.set(value, new Runnable() {
+			@Override
+			public void run() {
+				handler.post(new Runnable() {
+					@Override
+					public void run() {
+						updateField();
+						setting = false;
+						System.out.println("Update: " + accessor.get());
+					}
+				});
+			}
+		});
 	}
 	
 	public static String humanReadableField(String name) {
@@ -92,5 +105,10 @@ public abstract class FieldEditor<T> extends Composite {
 			}
 		}
 		return hName;
+	}
+	
+	@Override
+	public Handler handler() {
+		return handler;
 	}
 }

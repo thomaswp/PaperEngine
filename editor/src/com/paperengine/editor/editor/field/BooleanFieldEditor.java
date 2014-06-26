@@ -7,7 +7,6 @@ import org.eclipse.swt.layout.RowLayout;
 import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Composite;
 
-import com.paperengine.core.Editor;
 import com.paperengine.editor.editor.accessor.Accessor;
 
 public class BooleanFieldEditor extends FieldEditor<Boolean> {
@@ -33,8 +32,17 @@ public class BooleanFieldEditor extends FieldEditor<Boolean> {
 	
 	@Override
 	public void updateFieldLocal() {
-		buttonValue.setEnabled(!Editor.playing);
 		buttonValue.setSelection(getValue());
+	}
+
+	@Override
+	protected Boolean getUI() {
+		return buttonValue.getSelection();
+	}
+
+	@Override
+	protected void setEnabledLocal(boolean enabled) {
+		buttonValue.setEnabled(enabled);
 	}
 
 }

@@ -250,7 +250,7 @@ public class SWTMainWindow implements ObjectSelectedListener {
 
 		shell.open();		
 		start(); // render loop thread
-
+		
 		while (!shell.isDisposed()) {
 			if (!display.readAndDispatch()) {
 				update();

@@ -28,11 +28,13 @@ public class FieldAccessor implements Accessor {
 	}
 
 	@Override
-	public void set(Object value) {
+	public void set(Object value, Runnable callback) {
 		try {
 			field.set(object, value);
 		} catch (Exception e) {
 			e.printStackTrace();
+		} finally {
+			if (callback != null) callback.run();
 		}
 	}
 
@@ -65,5 +67,12 @@ public class FieldAccessor implements Accessor {
 	@Override
 	public Accessor copyForObject(Object object) {
 		return new FieldAccessor(field, object);
+	}
+
+	@Override
+	public boolean sameAs(Object value) {
+		Object obj = get();
+		if (value == null) return value == obj;
+		return value.equals(obj);
 	}
 }

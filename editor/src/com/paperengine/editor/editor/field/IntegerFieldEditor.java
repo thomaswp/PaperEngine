@@ -25,5 +25,13 @@ public class IntegerFieldEditor extends NumberFieldEditor<Integer> {
 			return false;
 		}
 	}
-
+	
+	@Override
+	protected Integer getUI() {
+		try {
+			return Integer.parseInt(textValue.getText());
+		} catch (NumberFormatException e){
+			return 0;
+		}
+	}
 }

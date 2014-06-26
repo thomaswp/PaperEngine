@@ -1,6 +1,7 @@
 package com.paperengine.editor.editor.accessor;
 
 import java.lang.reflect.Field;
+import java.security.InvalidParameterException;
 
 import pythagoras.f.IPoint;
 import pythagoras.f.Point;
@@ -18,9 +19,14 @@ public class PointAccessor extends FieldAccessor {
 	}
 	
 	@Override
-	public void set(Object value) {	
+	public void set(Object value, Runnable callback) {	
 		Point point = (Point) super.get();
-		point.set((IPoint) value);
+		if (value == null) {
+			throw new InvalidParameterException("Point cannot be null.");
+		} else {
+			point.set((IPoint) value);
+		}
+		if (callback != null) callback.run();
 	}
 
 	@Override

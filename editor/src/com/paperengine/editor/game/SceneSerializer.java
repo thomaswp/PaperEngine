@@ -57,7 +57,7 @@ public class SceneSerializer {
 			}
 			
 			public void startAccessor(Accessor accessor) {
-				accessor.copyForObject(currentComponent).set(accessor.get());
+				accessor.copyForObject(currentComponent).set(accessor.get(), null);
 			}
 			
 		});

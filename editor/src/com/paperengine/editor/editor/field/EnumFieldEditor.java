@@ -8,7 +8,6 @@ import org.eclipse.swt.widgets.Combo;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Label;
 
-import com.paperengine.core.Editor;
 import com.paperengine.editor.editor.accessor.Accessor;
 
 public class EnumFieldEditor extends FieldEditor<Enum<?>> {
@@ -62,7 +61,16 @@ public class EnumFieldEditor extends FieldEditor<Enum<?>> {
 	
 	@Override
 	public void updateFieldLocal() {
-		comboValue.setEnabled(!Editor.playing);
 		comboValue.select(getIndex());
+	}
+
+	@Override
+	protected Enum<?> getUI() {
+		return constants[comboValue.getSelectionIndex()];
+	}
+
+	@Override
+	protected void setEnabledLocal(boolean enabled) {
+		comboValue.setEnabled(enabled);
 	}
 }

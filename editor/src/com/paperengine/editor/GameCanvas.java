@@ -26,7 +26,6 @@ public class GameCanvas extends Canvas {
 	private PaperGame game;
 	private Scene scene;
 	private JavaEditorPlatform platform;
-	private Thread gameThread;
 	
 	public void setGame(PaperGame game) {
 		this.game = game;
@@ -62,7 +61,7 @@ public class GameCanvas extends Canvas {
 	}
 	
 	public void dispose() {
-		platform.dispose();
+		platform.shutdown();
 	}
 	
 	public void init() {
@@ -88,16 +87,19 @@ public class GameCanvas extends Canvas {
 			}
 		});
 		
-		
-		gameThread = new Thread(new Runnable() {
+		Thread t = new Thread(new Runnable() {
+			
 			@Override
 			public void run() {
 				platform.run(game);
+				while (true) {
+					platform.update();
+				}
 			}
 		});
-		gameThread.start();
+		t.start();
 	}
-
+	
 	public void pushScene() {
 		sceneStack.add(0, scene);
 		setScene(SceneSerializer.copy(scene));

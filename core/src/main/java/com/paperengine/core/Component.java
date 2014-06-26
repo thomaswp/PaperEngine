@@ -25,7 +25,7 @@ public abstract class Component implements IUpdatable, Postable {
 	
 	public void paint(Clock clock) { }
 	
-	public void updateEditor(float delta) { 
+	public void updateEditor(float delta) {
 		handler.update();
 	}
 	

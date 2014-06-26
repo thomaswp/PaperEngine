@@ -7,11 +7,16 @@ public class Editor {
 	public static boolean viewingEditor;
 	
 	public static boolean updateEditor() {
-		return viewingEditor;
+//		return viewingEditor;
+		return !playing || paused;
 	}
 	
 	public static boolean updateGame() {
 		return playing && !paused;
+	}
+	
+	public static boolean canEdit() {
+		return !playing || paused;
 	}
 
 //	public static String status() {

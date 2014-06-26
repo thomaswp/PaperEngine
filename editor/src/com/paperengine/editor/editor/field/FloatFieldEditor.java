@@ -25,4 +25,13 @@ public class FloatFieldEditor extends NumberFieldEditor<Float> {
 			return false;
 		}
 	}
+
+	@Override
+	protected Float getUI() {
+		try {
+			return Float.parseFloat(textValue.getText());
+		} catch (NumberFormatException e){
+			return 0f;
+		}
+	}
 }

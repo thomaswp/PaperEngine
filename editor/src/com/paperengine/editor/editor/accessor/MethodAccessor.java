@@ -36,7 +36,7 @@ public class MethodAccessor implements Accessor {
 	}
 
 	@Override
-	public void set(final Object value) {
+	public void set(final Object value, final Runnable callback) {
 		object.handler().post(new Runnable() {
 			@Override
 			public void run() {
@@ -44,6 +44,8 @@ public class MethodAccessor implements Accessor {
 					setter.invoke(object, value);
 				} catch (Exception e) {
 					e.printStackTrace();
+				} finally {
+					if (callback != null) callback.run();
 				}
 			}
 		});
@@ -98,5 +100,12 @@ public class MethodAccessor implements Accessor {
 	@Override
 	public Accessor copyForObject(Object object) {
 		return new MethodAccessor(name, getter, setter, (Postable) object);
+	}
+	
+	@Override
+	public boolean sameAs(Object value) {
+		Object obj = get();
+		if (value == null) return value == obj;
+		return value.equals(obj);
 	}
 }
