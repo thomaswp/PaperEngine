@@ -4,7 +4,8 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.eclipse.swt.SWT;
-import org.eclipse.swt.layout.RowLayout;
+import org.eclipse.swt.layout.GridData;
+import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Label;
 
@@ -20,13 +21,12 @@ public abstract class ComponentEditor<T extends Component> extends Composite {
 	
 	public ComponentEditor(Composite parent, T component) {
 		super(parent, SWT.BORDER);
-		RowLayout layout = new RowLayout(SWT.VERTICAL);
-		layout.fill = true;
-		layout.spacing = 1;
+		GridLayout layout = new GridLayout(2, false);
 		setLayout(layout);
 		this.component = component;
 		
 		nameLabel = new Label(this, SWT.NONE);
+		nameLabel.setLayoutData(new GridData(SWT.LEFT, SWT.CENTER, false, false, 2, 1));
 		nameLabel.setText(component.getClass().getSimpleName());
 	}
 

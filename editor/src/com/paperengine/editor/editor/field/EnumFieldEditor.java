@@ -6,13 +6,11 @@ import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.layout.RowLayout;
 import org.eclipse.swt.widgets.Combo;
 import org.eclipse.swt.widgets.Composite;
-import org.eclipse.swt.widgets.Label;
 
 import com.paperengine.editor.editor.accessor.Accessor;
 
 public class EnumFieldEditor extends FieldEditor<Enum<?>> {
 
-	protected Label labelName;
 	protected Combo comboValue;
 	protected Enum<?>[] constants;
 	
@@ -20,10 +18,6 @@ public class EnumFieldEditor extends FieldEditor<Enum<?>> {
 	public EnumFieldEditor(Composite parent, Accessor accessor) {
 		super(parent, accessor);
 		setLayout(new RowLayout(SWT.HORIZONTAL));
-		
-		String name = humanReadableField(accessor.name());
-		labelName = new Label(this, SWT.NONE);
-		labelName.setText(name + ": ");
 		
 		comboValue = new Combo(this, SWT.NONE);
 		constants = ((Class<Enum<?>>) accessor.type()).getEnumConstants();

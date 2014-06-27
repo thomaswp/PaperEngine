@@ -7,14 +7,12 @@ import org.eclipse.swt.events.ModifyEvent;
 import org.eclipse.swt.events.ModifyListener;
 import org.eclipse.swt.layout.RowLayout;
 import org.eclipse.swt.widgets.Composite;
-import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Text;
 
 import com.paperengine.editor.editor.accessor.Accessor;
 
 public abstract class NumberFieldEditor<T> extends FieldEditor<T> {
 
-	protected Label labelName;
 	protected Text textValue;
 	private T lastValue;
 	
@@ -24,10 +22,7 @@ public abstract class NumberFieldEditor<T> extends FieldEditor<T> {
 	public NumberFieldEditor(Composite parent, Accessor accessor) {
 		super(parent, accessor);
 		setLayout(new RowLayout(SWT.HORIZONTAL));
-		
-		String name = humanReadableField(accessor.name());
-		labelName = new Label(this, SWT.NONE);
-		labelName.setText(name + ": ");
+	
 		textValue = new Text(this, SWT.BORDER);
 		textValue.setText(getText());
 		

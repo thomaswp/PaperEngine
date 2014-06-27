@@ -90,23 +90,6 @@ public abstract class FieldEditor<T> extends Composite implements Postable {
 		});
 	}
 	
-	public static String humanReadableField(String name) {
-		String hName = "";
-		boolean capitalize = true;
-		for (char c : name.toCharArray()) {
-			if (!Character.isLowerCase(c) && hName.length() > 0) {
-				hName += " " + c;
-			} else if (capitalize) {
-				hName += Character.toUpperCase(c);
-				capitalize = false;
-			} else {
-				hName += c;
-				capitalize = false;
-			}
-		}
-		return hName;
-	}
-	
 	@Override
 	public Handler handler() {
 		return handler;

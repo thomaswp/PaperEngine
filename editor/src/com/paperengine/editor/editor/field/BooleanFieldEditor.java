@@ -18,7 +18,7 @@ public class BooleanFieldEditor extends FieldEditor<Boolean> {
 		setLayout(new RowLayout(SWT.HORIZONTAL));
 		
 		buttonValue = new Button(this, SWT.CHECK);
-		buttonValue.setText(humanReadableField(accessor.name()));
+		buttonValue.setText("");
 		
 		buttonValue.addSelectionListener(new SelectionAdapter() {
 			@Override
