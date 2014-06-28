@@ -14,21 +14,20 @@ import com.paperengine.editor.editor.accessor.Accessor;
 
 public class PointFieldEditor extends FieldEditor<Point> {
 
-	private Label labelBeginParen, labelComma, labelEndParen;
 	private Text textX, textY;
 	
 	public PointFieldEditor(Composite parent, Accessor accessor) {
 		super(parent, accessor);
-		setLayout(new RowLayout(SWT.HORIZONTAL));
+		RowLayout layout = new RowLayout(SWT.HORIZONTAL);
+		layout.center = true;
+		setLayout(layout);
 		
-		labelBeginParen = new Label(this, SWT.NONE);
-		labelBeginParen.setText("(");
+		Label labelX = new Label(this, SWT.NONE);
+		labelX.setText("X: ");
 		textX = new Text(this, SWT.BORDER);
-		labelComma = new Label(this, SWT.NONE);
-		labelComma.setText(", ");
+		Label labelY = new Label(this, SWT.NONE);
+		labelY.setText("Y: ");
 		textY = new Text(this, SWT.BORDER);
-		labelEndParen = new Label(this, SWT.NONE);
-		labelEndParen.setText(")");
 		
 		textX.addModifyListener(new ModifyListener() {
 			@Override

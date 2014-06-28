@@ -26,7 +26,6 @@ public abstract class CanvasRenderer extends SizedRenderer {
 		layer = graphics().createImageLayer();
 	}
 	
-	
 	public void refreshImage() {
 		layer.setImage(createImage(width, height));
 	}

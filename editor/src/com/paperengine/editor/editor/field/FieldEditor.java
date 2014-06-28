@@ -34,7 +34,11 @@ public abstract class FieldEditor<T> extends Composite implements Postable {
 		if (type == float.class || type == Float.class) {
 			return new FloatFieldEditor(parent, accessor); 
 		} else if (type == int.class || type == Integer.class) {
-			return new IntegerFieldEditor(parent, accessor); 
+			if (accessor.name().toLowerCase().contains("color")) {
+				return new ColorFieldEditor(parent, accessor);
+			} else {
+				return new IntegerFieldEditor(parent, accessor);
+			}
 		} else if (type == boolean.class || type == Boolean.class) {
 			return new BooleanFieldEditor(parent, accessor); 
 		} else if (type == Point.class) {
@@ -73,7 +77,7 @@ public abstract class FieldEditor<T> extends Composite implements Postable {
 	
 	protected void setValue(T value) {
 		if (getting || accessor.sameAs(value)) return;
-		System.out.println("Set: " + value);
+//		System.out.println("Set: " + value);
 		setting = true;
 		accessor.set(value, new Runnable() {
 			@Override
@@ -83,7 +87,7 @@ public abstract class FieldEditor<T> extends Composite implements Postable {
 					public void run() {
 						updateField();
 						setting = false;
-						System.out.println("Update: " + accessor.get());
+//						System.out.println("Update: " + accessor.get());
 					}
 				});
 			}

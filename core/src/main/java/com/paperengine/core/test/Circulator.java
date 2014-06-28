@@ -1,4 +1,6 @@
-package com.paperengine.core;
+package com.paperengine.core.test;
+
+import com.paperengine.core.Component;
 
 public class Circulator extends Component {
 	

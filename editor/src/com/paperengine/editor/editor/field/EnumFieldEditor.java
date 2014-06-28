@@ -55,6 +55,7 @@ public class EnumFieldEditor extends FieldEditor<Enum<?>> {
 	
 	@Override
 	public void updateFieldLocal() {
+		if (comboValue.isFocusControl()) return;
 		comboValue.select(getIndex());
 	}
 

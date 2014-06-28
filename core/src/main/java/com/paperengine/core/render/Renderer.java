@@ -1,10 +1,13 @@
 package com.paperengine.core.render;
 
 import playn.core.Layer;
+import tripleplay.util.Colors;
 
 import com.paperengine.core.Component;
 
 public abstract class Renderer extends Component {
+	
+	public int tintColor = Colors.WHITE;
 	
 	public float originX() {
 		return layer().originX();
@@ -28,4 +31,15 @@ public abstract class Renderer extends Component {
 	
 	public abstract Layer layer();
 
+	@Override
+	public void update(float delta) {
+		super.update(delta);
+		layer().setTint(tintColor);
+	}
+	
+	@Override
+	public void updateEditor(float delta) {
+		super.updateEditor(delta);
+		layer().setTint(tintColor);
+	}
 }

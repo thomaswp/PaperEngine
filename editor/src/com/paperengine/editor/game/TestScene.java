@@ -3,13 +3,13 @@ package com.paperengine.editor.game;
 import playn.core.PlayN;
 import tripleplay.util.Colors;
 
-import com.paperengine.core.Circulator;
 import com.paperengine.core.GameObject;
 import com.paperengine.core.Scene;
 import com.paperengine.core.camera.Camera;
 import com.paperengine.core.render.ImageRenderer;
 import com.paperengine.core.render.ShapeRenderer;
 import com.paperengine.core.render.ShapeRenderer.ShapeType;
+import com.paperengine.core.test.Circulator;
 
 public class TestScene extends Scene {
 	private static final long serialVersionUID = 1L;
