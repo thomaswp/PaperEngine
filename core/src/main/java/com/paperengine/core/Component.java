@@ -19,6 +19,8 @@ public abstract class Component implements IUpdatable, Postable {
 		return gameObject;
 	}
 	
+	public void init() { }
+	
 	public void update(float delta) { 
 		handler.update();
 	}

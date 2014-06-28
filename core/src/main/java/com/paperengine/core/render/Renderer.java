@@ -4,6 +4,7 @@ import playn.core.Layer;
 import tripleplay.util.Colors;
 
 import com.paperengine.core.Component;
+import com.paperengine.core.editor.EditorLayer;
 
 public abstract class Renderer extends Component {
 	
@@ -31,6 +32,12 @@ public abstract class Renderer extends Component {
 	
 	public abstract Layer layer();
 
+	@Override
+	public void init() {
+		super.init();
+		EditorLayer.get().registerLayer(layer(), this);
+	}
+	
 	@Override
 	public void update(float delta) {
 		super.update(delta);

@@ -121,6 +121,16 @@ public final class GameObject implements IUpdatable {
 		name = getClass().getSimpleName();
 	}
 	
+	@Override
+	public void init() {
+		for (Component component : components) {
+			component.init();
+		}
+		for (GameObject child : children) {
+			child.init();
+		}
+	}
+	
 	public void addComponent(Component component) {
 		if (component == null) return;
 		this.components.add(component);

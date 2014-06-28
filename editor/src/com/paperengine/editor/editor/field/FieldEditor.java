@@ -4,18 +4,16 @@ import java.lang.reflect.Type;
 
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.widgets.Composite;
+import org.eclipse.swt.widgets.Display;
 
 import pythagoras.f.Point;
 
 import com.paperengine.core.Editor;
-import com.paperengine.core.Handler;
 import com.paperengine.core.Scene;
-import com.paperengine.core.Handler.Postable;
 import com.paperengine.editor.editor.accessor.Accessor;
 
-public abstract class FieldEditor<T> extends Composite implements Postable {
+public abstract class FieldEditor<T> extends Composite {
 	
-	protected Handler handler;
 	protected Accessor accessor;
 	private boolean wasPlaying;
 	private boolean setting, getting;
@@ -25,7 +23,6 @@ public abstract class FieldEditor<T> extends Composite implements Postable {
 	
 	public FieldEditor(Composite parent, Accessor accessor) {
 		super(parent, SWT.NONE);
-		handler = new Handler();
 		this.accessor = accessor;
 	}
 	
@@ -52,7 +49,6 @@ public abstract class FieldEditor<T> extends Composite implements Postable {
 	}
 
 	public void update(Scene scene) {
-		handler.update();
 		setEnabledLocal(Editor.canEdit());
 		if (wasPlaying || Editor.playing) {
 			updateField();
@@ -82,7 +78,7 @@ public abstract class FieldEditor<T> extends Composite implements Postable {
 		accessor.set(value, new Runnable() {
 			@Override
 			public void run() {
-				handler.post(new Runnable() {
+				Display.getDefault().asyncExec(new Runnable() {
 					@Override
 					public void run() {
 						updateField();
@@ -92,10 +88,5 @@ public abstract class FieldEditor<T> extends Composite implements Postable {
 				});
 			}
 		});
-	}
-	
-	@Override
-	public Handler handler() {
-		return handler;
 	}
 }

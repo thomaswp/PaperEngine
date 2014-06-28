@@ -7,18 +7,22 @@ import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.events.SelectionListener;
 import org.eclipse.swt.widgets.Composite;
+import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Tree;
 import org.eclipse.swt.widgets.TreeItem;
 import org.eclipse.swt.widgets.Widget;
 
 import com.paperengine.core.GameObject;
 import com.paperengine.core.Scene;
+import com.paperengine.core.editor.EditorLayer;
+import com.paperengine.core.editor.EditorLayer.SelectedListener;
 
 public class ObjectTree implements SelectionListener {
 
 	private Tree tree;
 	private Scene scene;
 	private ObjectSelectedListener listener;
+	private boolean setCallback;
 	
 	public ObjectTree(Composite arg0, int arg1) {
 		tree = new Tree(arg0, arg1);
@@ -69,7 +73,7 @@ public class ObjectTree implements SelectionListener {
 		}
 
 		tree.setSelection(newSelected);
-		select(newSelected.length == 0 ? null : newSelected[0]);
+		select(newSelected.length == 0 ? null : newSelected[0], true);
 	}
 	
 	private TreeItem getItemWithId(TreeItem item, int id) {
@@ -77,6 +81,14 @@ public class ObjectTree implements SelectionListener {
 		for (TreeItem i : item.getItems()) {
 			TreeItem match = getItemWithId(i, id);
 			if (match != null) return match;
+		}
+		return null;
+	}
+	
+	private TreeItem getItemWithId(int id) {
+		for (TreeItem item : tree.getItems()) {
+			TreeItem ti = getItemWithId(item, id);
+			if (ti != null) return ti;
 		}
 		return null;
 	}
@@ -111,7 +123,24 @@ public class ObjectTree implements SelectionListener {
 	}
 
 	public void update(Scene scene) {
-		
+		if (!setCallback && EditorLayer.get() != null) {
+			setCallback = true;
+			EditorLayer.get().setSelectedListener(new SelectedListener() {
+				@Override
+				public void onSelected(final GameObject selected) {
+					Display.getDefault().asyncExec(new Runnable() {
+						@Override
+						public void run() {
+							if (selected == null) {
+								select((TreeItem) null, false);
+							} else {
+								select(getItemWithId(selected.id()), false);
+							}
+						}
+					});
+				}
+			});
+		}
 	}
 
 	public Tree tree() {
@@ -122,21 +151,32 @@ public class ObjectTree implements SelectionListener {
 		void onObjectSelected(GameObject object);
 	}
 
-	private void select(Widget item) {
+	private void select(Widget item, boolean fromEvent) {
 		GameObject object = null;
 		if (item != null) object = scene.getObjectById((Integer) item.getData());
 		if (listener != null) {
 			listener.onObjectSelected(object);
 		}
+		if (fromEvent && EditorLayer.get() != null) {
+			final GameObject fo = object;
+			EditorLayer.get().handler().post(new Runnable() {
+				@Override
+				public void run() {
+					EditorLayer.get().setSelectedObject(fo);
+				}
+			});
+		} else {
+			tree.setSelection(new TreeItem[] { (TreeItem) item });
+		}
 	}
 	
 	@Override
 	public void widgetDefaultSelected(SelectionEvent event) {
-		select(null);
+		select(null, true);
 	}
 
 	@Override
 	public void widgetSelected(SelectionEvent event) {
-		select(event.item);
+		select(event.item, true);
 	}
 }

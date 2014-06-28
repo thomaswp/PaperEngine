@@ -8,31 +8,19 @@ import java.util.List;
 
 import playn.core.GroupLayer;
 import playn.core.Layer;
-import playn.core.Mouse.ButtonEvent;
-import playn.core.Mouse.Listener;
-import playn.core.Mouse.MotionEvent;
-import playn.core.Mouse.WheelEvent;
 import playn.core.util.Clock;
 import pythagoras.f.Point;
 
 import com.paperengine.core.camera.Camera;
 import com.paperengine.core.editor.EditorLayer;
 
-public class Scene implements IUpdatable, Listener, Serializable {
+public class Scene implements IUpdatable, Serializable {
 	private static final long serialVersionUID = 1L;
 	
 	private List<GameObject> gameObjects = new ArrayList<GameObject>();
 	private List<GameObject> allGameObjects = new ArrayList<GameObject>();
 	private GroupLayer layer; 
 	private int nextObjectId = 0;
-	
-	private boolean editorMouseDown;
-	private Transform editorTransform = new Transform();
-	private Layer editorSelectedLayer;
-	
-	protected boolean isEditorSelectedLayer(Layer layer) {
-		return layer == editorSelectedLayer;
-	}
 	
 	public Layer layer() {
 		return layer;
@@ -44,6 +32,13 @@ public class Scene implements IUpdatable, Listener, Serializable {
 	
 	public Scene() {
 		layer = graphics().createGroupLayer();
+	}
+
+	@Override
+	public void init() {
+		for (GameObject object : gameObjects) {
+			object.init();
+		}
 	}
 	
 	public void addGameObject(GameObject gameObject) {
@@ -62,6 +57,10 @@ public class Scene implements IUpdatable, Listener, Serializable {
 		if (allGameObjects.contains(gameObject)) return gameObject.id();
 		allGameObjects.add(gameObject);
 		return nextObjectId++;
+	}
+	
+	public Layer hitTest(Point point) {
+		return layer.hitTest(point);
 	}
 	
 	public GameObject getObjectById(int id) {
@@ -105,7 +104,7 @@ public class Scene implements IUpdatable, Listener, Serializable {
 	public void updateTransform() {
 		Transform transform = null;
 		if (Editor.viewingEditor) {
-			transform = editorTransform;
+			transform = EditorLayer.get().editorTransform();
 		} else {
 			for (GameObject gameObject : gameObjects) {
 				if (gameObject.enabled()) {
@@ -123,52 +122,5 @@ public class Scene implements IUpdatable, Listener, Serializable {
 		layer.setScaleX(transform.scaleX);
 		layer.setScaleY(transform.scaleY);
 		layer.setRotation(transform.rotation);
-	}
-
-	@Override
-	public void onMouseDown(ButtonEvent event) {
-		if (!Editor.updateEditor()) return;
-		Point p = Layer.Util.screenToLayer(layer, event.x(), event.y());
-		editorSelectedLayer = layer.hitTest(p);
-		editorMouseDown = true;
-	}
-
-	@Override
-	public void onMouseUp(ButtonEvent event) {
-		if (!Editor.updateEditor()) return;
-		editorMouseDown = false;
-	}
-
-	@Override
-	public void onMouseMove(MotionEvent event) {
-		if (!Editor.updateEditor()) return;
-		if (editorMouseDown) {
-			editorTransform.position.x -= event.dx() / editorTransform.scaleX;
-			editorTransform.position.y -= event.dy() / editorTransform.scaleY;
-		}
-	}
-
-	@Override
-	public void onMouseWheelScroll(WheelEvent event) {
-		if (!Editor.updateEditor()) return;
-		Point mouse = mouseToGame(event.x(), event.y());
-		editorTransform.scaleX *= Math.pow(1.1, -event.velocity());
-		editorTransform.scaleY = editorTransform.scaleX;
-		Point newMouse = mouseToGame(event.x(), event.y());
-		editorTransform.position.addLocal(mouse.x - newMouse.x, mouse.y - newMouse.y);
-	}
-	
-	private Point mouseToGame(float x, float y) {
-		Point point = new Point();
-		point.x = (x - graphics().width() / 2) / editorTransform.scaleX + editorTransform.position.x;
-		point.y = (y - graphics().height() / 2) / editorTransform.scaleY + editorTransform.position.y;
-		return point;
-	}
-	
-	private Point gameToMouse(float x, float y) {
-		Point point = new Point();
-		point.x = (x - editorTransform.position.x) * editorTransform.scaleX + graphics().width() / 2;
-		point.y = (y - editorTransform.position.y) * editorTransform.scaleY + graphics().height() / 2;
-		return point;
 	}
 }

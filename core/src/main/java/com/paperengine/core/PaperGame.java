@@ -21,12 +21,14 @@ public class PaperGame extends Game.Default {
 	public void setScene(Scene scene) {
 		this.scene = scene;
 		editorLayer.reset();
+		editorLayer.setScene(scene);
+		mouse().setListener(editorLayer);
 		graphics().rootLayer().removeAll();
 		if (scene != null) {
 			graphics().rootLayer().add(scene.layer());
+			scene.init();
 		}
 		graphics().rootLayer().add(editorLayer.layer());
-		mouse().setListener(scene);
 	}
 	
 	public void post(Runnable callback) {
