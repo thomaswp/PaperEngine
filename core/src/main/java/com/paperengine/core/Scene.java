@@ -16,6 +16,7 @@ import playn.core.util.Clock;
 import pythagoras.f.Point;
 
 import com.paperengine.core.camera.Camera;
+import com.paperengine.core.editor.EditorLayer;
 
 public class Scene implements IUpdatable, Listener, Serializable {
 	private static final long serialVersionUID = 1L;
@@ -27,6 +28,11 @@ public class Scene implements IUpdatable, Listener, Serializable {
 	
 	private boolean editorMouseDown;
 	private Transform editorTransform = new Transform();
+	private Layer editorSelectedLayer;
+	
+	protected boolean isEditorSelectedLayer(Layer layer) {
+		return layer == editorSelectedLayer;
+	}
 	
 	public Layer layer() {
 		return layer;
@@ -93,6 +99,7 @@ public class Scene implements IUpdatable, Listener, Serializable {
 			gameObject.paintEditor(clock);
 		}
 		updateTransform();
+		EditorLayer.get().setSceneTransform(layer);
 	}
 
 	public void updateTransform() {
@@ -121,6 +128,8 @@ public class Scene implements IUpdatable, Listener, Serializable {
 	@Override
 	public void onMouseDown(ButtonEvent event) {
 		if (!Editor.updateEditor()) return;
+		Point p = Layer.Util.screenToLayer(layer, event.x(), event.y());
+		editorSelectedLayer = layer.hitTest(p);
 		editorMouseDown = true;
 	}
 

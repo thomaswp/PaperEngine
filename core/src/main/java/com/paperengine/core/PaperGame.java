@@ -1,14 +1,18 @@
 package com.paperengine.core;
 
-import static playn.core.PlayN.*;
+import static playn.core.PlayN.graphics;
+import static playn.core.PlayN.mouse;
 import playn.core.Game;
 import playn.core.util.Clock;
+
+import com.paperengine.core.editor.EditorLayer;
 
 public class PaperGame extends Game.Default {
 
 	private Scene scene;
 	private Clock.Source clock;
 	private Runnable callback;
+	private EditorLayer editorLayer;
 	
 	public Scene scene() {
 		return scene;
@@ -16,10 +20,12 @@ public class PaperGame extends Game.Default {
 	
 	public void setScene(Scene scene) {
 		this.scene = scene;
+		editorLayer.reset();
 		graphics().rootLayer().removeAll();
 		if (scene != null) {
 			graphics().rootLayer().add(scene.layer());
 		}
+		graphics().rootLayer().add(editorLayer.layer());
 		mouse().setListener(scene);
 	}
 	
@@ -34,6 +40,7 @@ public class PaperGame extends Game.Default {
 	@Override
 	public void init() {
 		clock = new Clock.Source(16);
+		editorLayer = new EditorLayer();
 		if (this.callback != null) {
 			this.callback.run();
 			this.callback = null;
@@ -48,7 +55,10 @@ public class PaperGame extends Game.Default {
 		}
 		clock.update(delta);
 		if (scene != null) {
-			if (Editor.updateEditor()) scene.updateEditor(delta); 
+			if (Editor.updateEditor()) {
+				scene.updateEditor(delta);
+				editorLayer.update(delta);
+			}
 			if (Editor.updateGame()) scene.update(delta);
 		}
 	}
@@ -56,8 +66,12 @@ public class PaperGame extends Game.Default {
 	@Override
 	public void paint(float alpha) {
 		clock.paint(alpha);
+		editorLayer.layer().setVisible(Editor.updateEditor());
 		if (scene != null) {
-			if (Editor.updateEditor()) scene.paintEditor(clock);
+			if (Editor.updateEditor()) {
+				scene.paintEditor(clock);
+				editorLayer.paint(clock);
+			}
 			if (Editor.updateGame()) scene.paint(clock);
 		}
 	}

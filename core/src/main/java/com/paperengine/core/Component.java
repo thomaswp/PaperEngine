@@ -1,8 +1,8 @@
 package com.paperengine.core;
 
-import com.paperengine.core.Handler.Postable;
-
 import playn.core.util.Clock;
+
+import com.paperengine.core.Handler.Postable;
 
 public abstract class Component implements IUpdatable, Postable {
 	

@@ -40,6 +40,7 @@ public abstract class Renderer extends Component {
 	@Override
 	public void updateEditor(float delta) {
 		super.updateEditor(delta);
+		layer().setInteractive(true);
 		layer().setTint(tintColor);
 	}
 }

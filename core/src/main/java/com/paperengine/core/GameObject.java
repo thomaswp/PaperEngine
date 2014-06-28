@@ -1,9 +1,10 @@
 package com.paperengine.core;
 
+import static playn.core.PlayN.graphics;
+
 import java.util.ArrayList;
 import java.util.List;
 
-import static playn.core.PlayN.*;
 import playn.core.GroupLayer;
 import playn.core.Layer;
 import playn.core.util.Clock;
@@ -12,7 +13,7 @@ import pythagoras.f.Point;
 import com.paperengine.core.camera.Camera;
 import com.paperengine.core.render.Renderer;
 
-public class GameObject implements IUpdatable {
+public final class GameObject implements IUpdatable {
 	
 	private List<GameObject> children = new ArrayList<GameObject>();
 	private List<Component> components = new ArrayList<Component>();
