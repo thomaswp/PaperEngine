@@ -6,6 +6,7 @@ import static playn.core.PlayN.log;
 
 import java.util.HashMap;
 
+import playn.core.CanvasImage;
 import playn.core.Color;
 import playn.core.GroupLayer;
 import playn.core.Image;
@@ -51,6 +52,11 @@ public class EditorLayer implements Listener, Postable {
 	private ImageLayer arrowX, arrowY;
 	private boolean draggingX, draggingY;
 	private Point startDragScreen, startDragObject;
+	private Point startDragBounds = new Point();
+	private Point startDragOrigin = new Point();
+	private GroupLayer dragPointLayer;
+	private ImageLayer[] dragPoints;
+	private int draggingPoint = -1;
 	
 	private Scene scene;
 	
@@ -103,6 +109,7 @@ public class EditorLayer implements Listener, Postable {
 				paintSelection(surface);
 			}
 		});
+		selectionLayer.setDepth(-2);
 		layer.add(selectionLayer);
 		
 		selectedLayer = graphics().createGroupLayer();
@@ -127,6 +134,23 @@ public class EditorLayer implements Listener, Postable {
 				cause.printStackTrace();
 			}
 		});
+		
+		dragPointLayer = graphics().createGroupLayer();
+		dragPointLayer.setVisible(false);
+		dragPointLayer.setDepth(-1);
+		layer.add(dragPointLayer);
+		float pointRadius = 4;
+		CanvasImage point = graphics().createImage(pointRadius * 2 + 1, pointRadius * 2 + 1);
+		point.canvas().setFillColor(Color.argb(255, 100, 100, 255));
+		point.canvas().fillCircle(pointRadius, pointRadius, pointRadius);
+		dragPoints = new ImageLayer[8];
+		for (int i = 0; i < dragPoints.length; i++) {
+			ImageLayer pointLayer = graphics().createImageLayer(point);
+			pointLayer.setOrigin(pointRadius, pointRadius);
+			pointLayer.setInteractive(true);
+			dragPointLayer.add(pointLayer);
+			dragPoints[i] = pointLayer;
+		}
 	}
 	
 	public void registerLayer(Layer layer, Component component) {
@@ -144,7 +168,6 @@ public class EditorLayer implements Listener, Postable {
 
 	public void paint(Source clock) {
 		selectedLayer.setVisible(selectedObject != null);
-		selectedLayer.setTy(100);
 		if (selectedObject != null) {
 			getFullTransform(selectedObject.layer(), tempTransform);
 			selectedLayer.setTranslation(tempTransform.tx(), tempTransform.ty());
@@ -153,21 +176,24 @@ public class EditorLayer implements Listener, Postable {
 			} catch (NoninvertibleTransformException e) {
 				selectedLayer.setRotation(0);
 			}
+			arrowX.setAlpha(draggingX && !draggingY ? 1 : 0.7f);
+			arrowY.setAlpha(draggingY && !draggingX ? 1 : 0.7f);
 		}
 	}
 	
 	private void paintSelection(Surface surface) {
+		dragPointLayer.setVisible(false);
 		if (selectedObject != null) {
 			Renderer renderer = selectedObject.renderer();
 			if (renderer != null && renderer instanceof SizedRenderer) {
+				dragPointLayer.setVisible(true);
 				surface.save();
 				getFullTransform(renderer.layer(), tempTransform);
 				surface.transform(tempTransform.m00, tempTransform.m01, tempTransform.m10, 
 						tempTransform.m11, tempTransform.tx, tempTransform.ty);
 				SizedRenderer sizedRenderer = (SizedRenderer) renderer;
 				float width = sizedRenderer.width(), height = sizedRenderer.height();
-				float left = sizedRenderer.originX() - width / 2;
-				float top = sizedRenderer.originY() - height / 2;
+				float left = 0, top = 0;
 				surface.setFillColor(Color.argb(75, 0, 0, 255));
 				surface.fillRect(left, top, width, height);
 				surface.restore();
@@ -187,6 +213,12 @@ public class EditorLayer implements Listener, Postable {
 					tempTransform.transform(tempPoint1, tempPoint1);
 					tempTransform.transform(tempPoint2, tempPoint2);
 					surface.drawLine(tempPoint1.x, tempPoint1.y, tempPoint2.x, tempPoint2.y, 2);
+
+					dragPoints[i * 2].setTint(draggingPoint == i * 2 ? Colors.WHITE : Color.argb(200, 100, 100, 255));
+					dragPoints[i * 2 + 1].setTint(draggingPoint == i * 2 + 1 ? Colors.WHITE : Color.argb(200, 100, 100, 255));
+					dragPoints[i * 2].setTranslation(tempPoint1.x, tempPoint1.y);
+					dragPoints[i * 2 + 1].setTranslation((tempPoint1.x + tempPoint2.x) / 2, 
+							(tempPoint1.y + tempPoint2.y) / 2);
 				}
 			}
 		}
@@ -224,6 +256,17 @@ public class EditorLayer implements Listener, Postable {
 			return;
 		}
 		
+		Layer dragPoint = getLayerHit(dragPointLayer, event); 
+		if (dragPoint != null) {
+			for (int i = 0; i < dragPoints.length; i++) {
+				if (dragPoints[i] == dragPoint) {
+					startResizeSelected(event, i);
+					break;
+				}
+			}
+			return;
+		}
+		
 		Point p = Layer.Util.screenToLayer(sceneLayer, event.x(), event.y());
 		Layer hit = scene.hitTest(p);
 		if (hit != null) {
@@ -250,6 +293,14 @@ public class EditorLayer implements Listener, Postable {
 		startDragObject = new Point(selectedObject.x(), selectedObject.y());
 	}
 	
+	private void startResizeSelected(ButtonEvent event, int index) {
+		SizedRenderer renderer = (SizedRenderer) selectedObject.renderer();
+		draggingPoint = index;
+		startDragScreen = new Point(event.x(), event.y());
+		startDragBounds.set(renderer.width(), renderer.height());
+		startDragOrigin.set(renderer.originX(), renderer.originY());
+	}
+	
 	private Layer getLayerHit(Layer parent, ButtonEvent event) {
 		tempPoint1.set(event.x(), event.y());
 		Point p = Layer.Util.screenToLayer(parent, tempPoint1, tempPoint1);
@@ -260,6 +311,7 @@ public class EditorLayer implements Listener, Postable {
 	public void onMouseUp(ButtonEvent event) {
 		draggingCamera = false;
 		draggingX = false; draggingY = false;
+		draggingPoint = -1;
 		if (!Editor.updateEditor()) return;
 	}
 
@@ -285,10 +337,60 @@ public class EditorLayer implements Listener, Postable {
 			}
 			
 			tempTransform.setTranslation(0, 0);
-			tempTransform.inverseTransform(tempPoint1, tempPoint1);
+			try {
+				tempTransform.inverseTransform(tempPoint1, tempPoint1);
+			} catch (NoninvertibleTransformException e) {
+				return;
+			}
 
 			transform.position.x = startDragObject.x + tempPoint1.x;
 			transform.position.y = startDragObject.y + tempPoint1.y;
+		} else if (selectedObject != null && draggingPoint >= 0) {
+			getFullTransform(selectedObject.layer(), tempTransform);
+			tempPoint1.set(event.x() - startDragScreen.x, event.y() - startDragScreen.y);
+		
+			tempTransform.setTranslation(0, 0);
+			try {
+				tempTransform.inverseTransform(tempPoint1, tempPoint1);
+			} catch (NoninvertibleTransformException e) {
+				return;
+			}
+			
+			if (draggingPoint % 2 == 1) {
+				if (draggingPoint % 4 == 1) {
+					tempPoint1.x = 0;
+				} else {
+					tempPoint1.y = 0;
+				}
+			}
+
+			SizedRenderer renderer = (SizedRenderer) selectedObject.renderer();
+			
+			if (renderer.centered()) {
+				if ((draggingPoint + 7) % 8 >= 5) {
+					// left side
+					tempPoint1.x *= -1;
+				}
+				if (draggingPoint < 3) {
+					// top side
+					tempPoint1.y *= -1;
+				}
+				// because it's centered, it grows twice as fast
+				tempPoint1.mult(2, tempPoint1);
+			} else {
+				float offOX = 0, offOY = 0;
+				if ((draggingPoint + 7) % 8 >= 5) {
+					offOX -= tempPoint1.x;
+					tempPoint1.x *= -1;
+				}
+				if (draggingPoint < 3) {
+					offOY -= tempPoint1.y;
+					tempPoint1.y *= -1;
+				}
+				renderer.setOrigin(startDragOrigin.x + offOX, startDragOrigin.y + offOY);
+			}
+
+			renderer.setSize(startDragBounds.x + tempPoint1.x, startDragBounds.y + tempPoint1.y);
 		}
 	}
 

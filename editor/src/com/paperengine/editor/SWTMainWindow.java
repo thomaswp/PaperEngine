@@ -130,7 +130,7 @@ public class SWTMainWindow implements ObjectSelectedListener {
 		display = Display.getDefault();
 		Shell shell = new Shell();
 		shell.setSize(1024, 600);
-		shell.setText("SWT GL Mutiple Composites");
+		shell.setText("PaperEngine");
 		shell.setLayout(new GridLayout(1, false));
 		
 		Composite compositeTopPanel = new Composite(shell, SWT.NONE);
