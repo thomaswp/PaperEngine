@@ -1,11 +1,14 @@
 package com.paperengine.editor.game;
 
+import org.jbox2d.dynamics.BodyType;
+
 import playn.core.PlayN;
 import tripleplay.util.Colors;
 
 import com.paperengine.core.GameObject;
 import com.paperengine.core.Scene;
 import com.paperengine.core.camera.Camera;
+import com.paperengine.core.physics.BoxCollider;
 import com.paperengine.core.render.ImageRenderer;
 import com.paperengine.core.render.ShapeRenderer;
 import com.paperengine.core.render.ShapeRenderer.ShapeType;
@@ -25,7 +28,10 @@ public class TestScene extends Scene {
 		renderer.set(ShapeType.Circle, 100, 100, Colors.BLUE, Colors.WHITE, 4, 0);
 		renderer.setCentered(true);
 		obj.addComponent(renderer);
-		obj.addComponent(new Circulator());
+//		obj.addComponent(new Circulator());
+		BoxCollider collider = new BoxCollider();
+		collider.width = 100; collider.height = 100;
+		obj.addComponent(collider);
 		obj.setName("Circle");
 		
 		GameObject child = new GameObject();
@@ -45,9 +51,25 @@ public class TestScene extends Scene {
 		fireballRenderer.setCentered(true);
 		fireball.addComponent(fireballRenderer);
 		fireball.transform().position.set(-100, -100);
+		collider = new BoxCollider();
+		collider.width = 32; collider.height = 32;
+		fireball.addComponent(collider);
+		
+		GameObject ground = new GameObject();
+		ground.setName("Ground");
+		renderer = new ShapeRenderer();
+		renderer.set(ShapeType.Rectangle, 1000, 50, Colors.GRAY, Colors.DARK_GRAY, 2, 0);
+		renderer.setCentered(true);
+		ground.addComponent(renderer);
+		collider = new BoxCollider();
+		collider.width = 1000; collider.height = 50;
+		collider.bodyType = BodyType.STATIC;
+		ground.addComponent(collider);
+		ground.transform().position.set(0, 200);
 		
 		addGameObject(camera);
 		addGameObject(obj);
 		addGameObject(fireball);
+		addGameObject(ground);
 	}
 }

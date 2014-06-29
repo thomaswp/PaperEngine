@@ -6,7 +6,7 @@ import com.paperengine.core.Handler.Postable;
 
 public abstract class Component implements IUpdatable, Postable {
 	
-	protected GameObject gameObject;
+	GameObject gameObject;
 	private final Handler handler = new Handler();
 	
 	protected Component() { }
@@ -17,6 +17,10 @@ public abstract class Component implements IUpdatable, Postable {
 	
 	public GameObject gameObject() {
 		return gameObject;
+	}
+	
+	protected Scene scene() {
+		return gameObject.scene();
 	}
 	
 	public void init() { }

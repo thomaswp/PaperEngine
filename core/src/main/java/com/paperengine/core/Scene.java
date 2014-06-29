@@ -6,6 +6,9 @@ import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.jbox2d.common.Vec2;
+import org.jbox2d.dynamics.World;
+
 import playn.core.GroupLayer;
 import playn.core.Layer;
 import playn.core.util.Clock;
@@ -17,13 +20,20 @@ import com.paperengine.core.editor.EditorLayer;
 public class Scene implements IUpdatable, Serializable {
 	private static final long serialVersionUID = 1L;
 	
+	public final static float PHYSICS_SCALE = 0.1f;
+	
 	private List<GameObject> gameObjects = new ArrayList<GameObject>();
 	private List<GameObject> allGameObjects = new ArrayList<GameObject>();
 	private GroupLayer layer; 
 	private int nextObjectId = 0;
+	private transient World physicsWorld;
 	
 	public Layer layer() {
 		return layer;
+	}
+	
+	public World physicsWorld() {
+		return physicsWorld;
 	}
 	
 	public Iterable<GameObject> gameObjects() {
@@ -36,6 +46,7 @@ public class Scene implements IUpdatable, Serializable {
 
 	@Override
 	public void init() {
+		physicsWorld = new World(new Vec2(0, 10));
 		for (GameObject object : gameObjects) {
 			object.init();
 		}
@@ -76,6 +87,7 @@ public class Scene implements IUpdatable, Serializable {
 				gameObject.update(delta);
 			}
 		}
+		physicsWorld.step(delta / 1000, 5, 5);
 	}
 	
 	public void paint(Clock clock) {

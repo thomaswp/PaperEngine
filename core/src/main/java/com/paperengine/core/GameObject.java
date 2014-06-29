@@ -32,6 +32,10 @@ public final class GameObject implements IUpdatable {
 		return id;
 	}
 
+	protected Scene scene() {
+		return scene;
+	}
+	
 	protected void setScene(Scene scene) {
 		this.scene = scene;
 		this.id = scene.registerGameObject(this);
