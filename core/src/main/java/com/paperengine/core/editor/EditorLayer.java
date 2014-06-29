@@ -57,7 +57,7 @@ public class EditorLayer implements Listener, Postable {
 	private GroupLayer dragPointLayer;
 	private ImageLayer[] dragPoints;
 	private int draggingPoint = -1;
-	
+
 	private Scene scene;
 	
 	private HashMap<Layer, Component> layerMap = new HashMap<Layer, Component>();
@@ -429,5 +429,32 @@ public class EditorLayer implements Listener, Postable {
 	@Override
 	public Handler handler() {
 		return handler;
+	}
+
+	public void renderBackground(Surface surface) {
+		surface.setFillColor(Color.argb(100, 150, 150, 150));
+		float baseSize = 100;
+		float scale = editorTransform.scaleX;
+		float size = baseSize * scale;
+		// top left/right corner
+		float cornerX = editorTransform.position.x - graphics().width() / 2  / scale;
+		float cornerY = editorTransform.position.y - graphics().height() / 2  / scale;
+		// make the position positive, without changing it's mod
+		if (cornerX < 0) cornerX += baseSize * (int) (cornerX / baseSize + 1);
+		if (cornerY < 0) cornerY += baseSize * (int) (cornerY / baseSize + 1);
+		// the start should be at most at the origin
+		float x = -(cornerX % baseSize) * scale;
+		float y = -(cornerY % baseSize) * scale;
+		
+		float w = graphics().width(), h = graphics().height();
+		while (x < w) {
+			surface.drawLine(x, 0, x, h, 1);
+			x += size;
+		}
+		while (y < h) {
+			surface.drawLine(0, y, w, y, 1);
+			y += size;
+		}
+		
 	}
 }

@@ -3,6 +3,9 @@ package com.paperengine.core;
 import static playn.core.PlayN.graphics;
 import static playn.core.PlayN.mouse;
 import playn.core.Game;
+import playn.core.ImmediateLayer;
+import playn.core.ImmediateLayer.Renderer;
+import playn.core.Surface;
 import playn.core.util.Clock;
 
 import com.paperengine.core.editor.EditorLayer;
@@ -13,6 +16,7 @@ public class PaperGame extends Game.Default {
 	private Clock.Source clock;
 	private Runnable callback;
 	private EditorLayer editorLayer;
+	private ImmediateLayer backgroundLayer;
 	
 	public Scene scene() {
 		return scene;
@@ -29,6 +33,7 @@ public class PaperGame extends Game.Default {
 			scene.init();
 		}
 		graphics().rootLayer().add(editorLayer.layer());
+		graphics().rootLayer().add(backgroundLayer);
 	}
 	
 	public void post(Runnable callback) {
@@ -43,6 +48,13 @@ public class PaperGame extends Game.Default {
 	public void init() {
 		clock = new Clock.Source(16);
 		editorLayer = new EditorLayer();
+		backgroundLayer = graphics().createImmediateLayer(new Renderer() {
+			@Override
+			public void render(Surface surface) {
+				editorLayer.renderBackground(surface);
+			}
+		});
+		backgroundLayer.setDepth(Float.NEGATIVE_INFINITY);
 		if (this.callback != null) {
 			this.callback.run();
 			this.callback = null;
@@ -69,6 +81,7 @@ public class PaperGame extends Game.Default {
 	public void paint(float alpha) {
 		clock.paint(alpha);
 		editorLayer.layer().setVisible(Editor.updateEditor());
+		backgroundLayer.setVisible(Editor.viewingEditor);
 		if (scene != null) {
 			if (Editor.updateEditor()) {
 				scene.paintEditor(clock);
