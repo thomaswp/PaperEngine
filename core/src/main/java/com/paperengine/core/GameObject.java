@@ -3,6 +3,7 @@ package com.paperengine.core;
 import static playn.core.PlayN.graphics;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 
 import playn.core.GroupLayer;
@@ -11,6 +12,7 @@ import playn.core.util.Clock;
 import pythagoras.f.Point;
 
 import com.paperengine.core.camera.Camera;
+import com.paperengine.core.physics.PhysicsBody;
 import com.paperengine.core.render.Renderer;
 
 public final class GameObject implements IUpdatable {
@@ -21,6 +23,7 @@ public final class GameObject implements IUpdatable {
 	private boolean enabled = true;
 	private Transform transform;
 	private Renderer renderer;
+	private PhysicsBody physicsBody;
 	private Camera camera;
 	private String name;
 	private Scene scene;
@@ -81,6 +84,10 @@ public final class GameObject implements IUpdatable {
 		this.renderer = component;
 		layer.add(renderer.layer());
 	}
+
+	public PhysicsBody physicsBody() {
+		return physicsBody;
+	}
 	
 	public Camera camera() {
 		return camera;
@@ -137,13 +144,62 @@ public final class GameObject implements IUpdatable {
 	
 	public void addComponent(Component component) {
 		if (component == null) return;
-		this.components.add(component);
+		if (components.contains(component)) {
+			throw new PaperEngineException("GameObject already contains Component " + component);
+		}
+		components.add(component);
 		component.gameObject = this;
 		if (component instanceof Renderer) {
 			setRenderer((Renderer) component);
 		} else if (component instanceof Camera) {
 			camera = (Camera) component;
+		} else if (component instanceof PhysicsBody) {
+			physicsBody = (PhysicsBody) component;
 		}
+		sortComponents();
+	}
+	
+	private void sortComponents() {
+		List<Component> freeNodes = new ArrayList<Component>();
+		List<Component> sorted = new ArrayList<Component>();
+		HashMap<Component, List<Component>> lessThan = new HashMap<Component, List<Component>>();
+		HashMap<Component, List<Component>> greaterThan = new HashMap<Component, List<Component>>();
+		for (Component component : components) {
+			lessThan.put(component, new ArrayList<Component>());
+			greaterThan.put(component, new ArrayList<Component>());
+		}
+		for (Component component : components) {
+			boolean free = true;
+			List<Component> gt = greaterThan.get(component);
+			for (Component pair : components) {
+				if (component == pair) continue;
+				if (gt.contains(component)) {
+					free = false;
+					continue;
+				}
+				if (component.compareTo(pair) > 0 || pair.compareTo(component) < 0) {
+					free = false;
+					greaterThan.get(component).add(pair);
+					lessThan.get(pair).add(component);
+				}
+			}
+			if (free) freeNodes.add(component);
+		}
+		while (freeNodes.size() > 0) {
+			Component tail = freeNodes.remove(0);
+			sorted.add(tail);
+			List<Component> outgoing = lessThan.get(tail);
+			for (int i = 0; i < outgoing.size(); i++) {
+				Component head = outgoing.remove(i--);
+				List<Component> incoming = greaterThan.get(head);
+				incoming.remove(tail);
+				if (incoming.size() == 0) {
+					freeNodes.add(head);
+				}
+			}
+		}
+		this.components.clear();
+		this.components.addAll(sorted);
 	}
 	
 	public boolean removeComponent(Component component) {
@@ -151,6 +207,10 @@ public final class GameObject implements IUpdatable {
 			throw new PaperEngineException("Cannot remove transform");
 		} else if (component == renderer) {
 			setRenderer(null);
+		} else if (component == physicsBody) {
+			physicsBody = null;
+		} else if (component == camera) {
+			camera = null;
 		}
 		return components.remove(component);
 	}

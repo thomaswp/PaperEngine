@@ -9,6 +9,7 @@ import com.paperengine.core.GameObject;
 import com.paperengine.core.Scene;
 import com.paperengine.core.camera.Camera;
 import com.paperengine.core.physics.BoxCollider;
+import com.paperengine.core.physics.PhysicsBody;
 import com.paperengine.core.render.ImageRenderer;
 import com.paperengine.core.render.ShapeRenderer;
 import com.paperengine.core.render.ShapeRenderer.ShapeType;
@@ -24,13 +25,14 @@ public class TestScene extends Scene {
 		camera.setName("Camera");
 		
 		GameObject obj = new GameObject();
+		BoxCollider collider = new BoxCollider();
+		collider.width = 100; collider.height = 100;
 		ShapeRenderer renderer = new ShapeRenderer();
 		renderer.set(ShapeType.Circle, 100, 100, Colors.BLUE, Colors.WHITE, 4, 0);
 		renderer.setCentered(true);
 		obj.addComponent(renderer);
 //		obj.addComponent(new Circulator());
-		BoxCollider collider = new BoxCollider();
-		collider.width = 100; collider.height = 100;
+		obj.addComponent(new PhysicsBody());
 		obj.addComponent(collider);
 		obj.setName("Circle");
 		
@@ -42,7 +44,7 @@ public class TestScene extends Scene {
 		child.addComponent(new Circulator());
 		child.setName("Square");
 		
-		obj.addChild(child);;
+		obj.addChild(child);
 		
 		GameObject fireball = new GameObject();
 		fireball.setName("Fireball");
@@ -51,6 +53,7 @@ public class TestScene extends Scene {
 		fireballRenderer.setCentered(true);
 		fireball.addComponent(fireballRenderer);
 		fireball.transform().position.set(-100, -100);
+		fireball.addComponent(new PhysicsBody());
 		collider = new BoxCollider();
 		collider.width = 32; collider.height = 32;
 		fireball.addComponent(collider);
@@ -61,9 +64,11 @@ public class TestScene extends Scene {
 		renderer.set(ShapeType.Rectangle, 1000, 50, Colors.GRAY, Colors.DARK_GRAY, 2, 0);
 		renderer.setCentered(true);
 		ground.addComponent(renderer);
+		PhysicsBody body = new PhysicsBody();
+		body.bodyType = BodyType.STATIC;
+		ground.addComponent(body);
 		collider = new BoxCollider();
 		collider.width = 1000; collider.height = 50;
-		collider.bodyType = BodyType.STATIC;
 		ground.addComponent(collider);
 		ground.transform().position.set(0, 200);
 		

@@ -4,7 +4,7 @@ import playn.core.util.Clock;
 
 import com.paperengine.core.Handler.Postable;
 
-public abstract class Component implements IUpdatable, Postable {
+public abstract class Component implements IUpdatable, Postable, Comparable<Component> {
 	
 	GameObject gameObject;
 	private final Handler handler = new Handler();
@@ -36,4 +36,9 @@ public abstract class Component implements IUpdatable, Postable {
 	}
 	
 	public void paintEditor(Clock clock) { }
+	
+	@Override
+	public int compareTo(Component o) {
+		return 0;
+	}
 }
