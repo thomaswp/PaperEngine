@@ -231,25 +231,8 @@ public final class GameObject implements IUpdatable {
 		return false;
 	}
 	
-	@SuppressWarnings("unchecked")
-	public <T extends Component> T getCompoment() {
-		for (Component component : components) {
-			try {
-				return (T) component;
-			} catch (Exception e) { }
-		}
-		return null;
-	}
-	
-	@SuppressWarnings("unchecked")
-	public <T extends Component> List<T> getCompoments() {
-		List<T> list = new ArrayList<T>();
-		for (Component component : components) {
-			try {
-				list.add((T) component);
-			} catch (Exception e) { }
-		}
-		return list;
+	public Iterable<Component> getComponents() {
+		return components;
 	}
 	
 	public void update(float delta) {

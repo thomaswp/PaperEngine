@@ -32,8 +32,11 @@ import com.paperengine.core.Handler;
 import com.paperengine.core.Handler.Postable;
 import com.paperengine.core.Scene;
 import com.paperengine.core.Transform;
+import com.paperengine.core.physics.AbstractBoxCollider;
 import com.paperengine.core.render.Renderer;
 import com.paperengine.core.render.SizedRenderer;
+import com.paperengine.core.util.EnumeratorUtils;
+import com.paperengine.core.util.EnumeratorUtils.Predicate;
 
 public class EditorLayer implements Listener, Postable {
 
@@ -169,6 +172,12 @@ public class EditorLayer implements Listener, Postable {
 	public void paint(Source clock) {
 		selectedLayer.setVisible(selectedObject != null);
 		if (selectedObject != null) {
+			Renderer renderer = selectedObject.renderer();
+			if (renderer != null && renderer instanceof SizedRenderer) {
+				SizedRenderer sizedRenderer = (SizedRenderer) renderer;
+				setDragPoints(renderer.layer(), 0, 0, sizedRenderer.width(), sizedRenderer.height());
+			}
+			
 			getFullTransform(selectedObject.layer(), tempTransform);
 			selectedLayer.setTranslation(tempTransform.tx(), tempTransform.ty());
 			try {
@@ -181,46 +190,84 @@ public class EditorLayer implements Listener, Postable {
 		}
 	}
 	
+	private static Predicate<Component> isBoxPredicate = new Predicate<Component>() {
+		@Override
+		public boolean isTrue(Component item) {
+			return item instanceof AbstractBoxCollider;
+		}
+	};
+	
 	private void paintSelection(Surface surface) {
 		dragPointLayer.setVisible(false);
 		if (selectedObject != null) {
 			Renderer renderer = selectedObject.renderer();
 			if (renderer != null && renderer instanceof SizedRenderer) {
 				dragPointLayer.setVisible(true);
-				surface.save();
-				getFullTransform(renderer.layer(), tempTransform);
-				surface.transform(tempTransform.m00, tempTransform.m01, tempTransform.m10, 
-						tempTransform.m11, tempTransform.tx, tempTransform.ty);
 				SizedRenderer sizedRenderer = (SizedRenderer) renderer;
 				float width = sizedRenderer.width(), height = sizedRenderer.height();
-				float left = 0, top = 0;
-				surface.setFillColor(Color.argb(75, 0, 0, 255));
-				surface.fillRect(left, top, width, height);
-				surface.restore();
-				
-				float[] corners = new float[] {
-						left, top,
-						left + width, top,
-						left + width, top + height,
-						left, top + height
-				};
-
-				surface.setFillColor(Colors.BLUE);
-				for (int i = 0; i < 4; i++) {
-					tempPoint1.set(corners[i * 2], corners[i * 2 + 1]); 
-					int j = (i + 1) % 4;
-					tempPoint2.set(corners[j * 2], corners[j * 2 + 1]);
-					tempTransform.transform(tempPoint1, tempPoint1);
-					tempTransform.transform(tempPoint2, tempPoint2);
-					surface.drawLine(tempPoint1.x, tempPoint1.y, tempPoint2.x, tempPoint2.y, 2);
-
-					dragPoints[i * 2].setTint(draggingPoint == i * 2 ? Colors.WHITE : Color.argb(200, 100, 100, 255));
-					dragPoints[i * 2 + 1].setTint(draggingPoint == i * 2 + 1 ? Colors.WHITE : Color.argb(200, 100, 100, 255));
-					dragPoints[i * 2].setTranslation(tempPoint1.x, tempPoint1.y);
-					dragPoints[i * 2 + 1].setTranslation((tempPoint1.x + tempPoint2.x) / 2, 
-							(tempPoint1.y + tempPoint2.y) / 2);
-				}
+				drawLocalRect(surface, sizedRenderer.layer(), 0, 0, width, height, 
+						Color.argb(75, 0, 0, 255), Colors.BLUE, 2);
 			}
+			Iterable<AbstractBoxCollider> boxColliders = 
+					EnumeratorUtils.where(selectedObject.getComponents(), isBoxPredicate);
+			for (AbstractBoxCollider collider : boxColliders) {
+				float width = collider.width(), height = collider.height();
+				float ox = collider.originX(), oy = collider.originY();
+				drawLocalRect(surface, selectedObject.layer(), -ox, -oy, 
+						width, height, Color.argb(75, 0, 255, 0), Colors.GREEN, 2);
+			}
+		}
+	}
+
+	private void drawLocalRect(Surface surface, Layer layer, float left, float top, float width, float height, int fillColor, int lineColor, float lineWidth) {
+		surface.save();
+		getFullTransform(layer, tempTransform);
+		surface.transform(tempTransform.m00, tempTransform.m01, tempTransform.m10, 
+				tempTransform.m11, tempTransform.tx, tempTransform.ty);
+		surface.setFillColor(fillColor);
+		surface.fillRect(left, top, width, height);
+		surface.restore();
+		
+		float[] corners = new float[] {
+				left, top,
+				left + width, top,
+				left + width, top + height,
+				left, top + height
+		};
+
+		surface.setFillColor(lineColor);
+		for (int i = 0; i < 4; i++) {
+			tempPoint1.set(corners[i * 2], corners[i * 2 + 1]); 
+			int j = (i + 1) % 4;
+			tempPoint2.set(corners[j * 2], corners[j * 2 + 1]);
+			tempTransform.transform(tempPoint1, tempPoint1);
+			tempTransform.transform(tempPoint2, tempPoint2);
+			surface.drawLine(tempPoint1.x, tempPoint1.y, tempPoint2.x, tempPoint2.y, lineWidth);
+		}
+	}
+	
+	private void setDragPoints(Layer layer, float left, float top, float width, float height) {
+		getFullTransform(layer, tempTransform);
+		
+		float[] corners = new float[] {
+				left, top,
+				left + width, top,
+				left + width, top + height,
+				left, top + height
+		};
+
+		for (int i = 0; i < 4; i++) {
+			tempPoint1.set(corners[i * 2], corners[i * 2 + 1]); 
+			int j = (i + 1) % 4;
+			tempPoint2.set(corners[j * 2], corners[j * 2 + 1]);
+			tempTransform.transform(tempPoint1, tempPoint1);
+			tempTransform.transform(tempPoint2, tempPoint2);
+
+			dragPoints[i * 2].setTint(draggingPoint == i * 2 ? Colors.WHITE : Color.argb(200, 100, 100, 255));
+			dragPoints[i * 2 + 1].setTint(draggingPoint == i * 2 + 1 ? Colors.WHITE : Color.argb(200, 100, 100, 255));
+			dragPoints[i * 2].setTranslation(tempPoint1.x, tempPoint1.y);
+			dragPoints[i * 2 + 1].setTranslation((tempPoint1.x + tempPoint2.x) / 2, 
+					(tempPoint1.y + tempPoint2.y) / 2);
 		}
 	}
 	

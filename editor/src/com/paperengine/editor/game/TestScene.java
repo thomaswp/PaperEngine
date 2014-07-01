@@ -10,6 +10,7 @@ import com.paperengine.core.Scene;
 import com.paperengine.core.camera.Camera;
 import com.paperengine.core.physics.BoxCollider;
 import com.paperengine.core.physics.PhysicsBody;
+import com.paperengine.core.physics.RendererBoxCollider;
 import com.paperengine.core.render.ImageRenderer;
 import com.paperengine.core.render.ShapeRenderer;
 import com.paperengine.core.render.ShapeRenderer.ShapeType;
@@ -25,15 +26,13 @@ public class TestScene extends Scene {
 		camera.setName("Camera");
 		
 		GameObject obj = new GameObject();
-		BoxCollider collider = new BoxCollider();
-		collider.width = 100; collider.height = 100;
 		ShapeRenderer renderer = new ShapeRenderer();
 		renderer.set(ShapeType.Circle, 100, 100, Colors.BLUE, Colors.WHITE, 4, 0);
 		renderer.setCentered(true);
 		obj.addComponent(renderer);
 //		obj.addComponent(new Circulator());
 		obj.addComponent(new PhysicsBody());
-		obj.addComponent(collider);
+		obj.addComponent(new RendererBoxCollider());
 		obj.setName("Circle");
 		
 		GameObject child = new GameObject();
@@ -54,8 +53,9 @@ public class TestScene extends Scene {
 		fireball.addComponent(fireballRenderer);
 		fireball.transform().position.set(-100, -100);
 		fireball.addComponent(new PhysicsBody());
-		collider = new BoxCollider();
+		BoxCollider collider = new BoxCollider();
 		collider.width = 32; collider.height = 32;
+		collider.originX = 16; collider.originY = 16;
 		fireball.addComponent(collider);
 		
 		GameObject ground = new GameObject();
@@ -67,9 +67,7 @@ public class TestScene extends Scene {
 		PhysicsBody body = new PhysicsBody();
 		body.bodyType = BodyType.STATIC;
 		ground.addComponent(body);
-		collider = new BoxCollider();
-		collider.width = 1000; collider.height = 50;
-		ground.addComponent(collider);
+		ground.addComponent(new RendererBoxCollider());
 		ground.transform().position.set(0, 200);
 		
 		addGameObject(camera);
