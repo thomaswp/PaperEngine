@@ -9,7 +9,6 @@ import java.util.List;
 import playn.core.GroupLayer;
 import playn.core.Layer;
 import playn.core.util.Clock;
-import pythagoras.f.Point;
 
 import com.paperengine.core.camera.Camera;
 import com.paperengine.core.physics.PhysicsBody;
@@ -248,7 +247,7 @@ public final class GameObject implements IUpdatable {
 		for (Component component : components) {
 			component.paint(clock);
 		}
-		updateTransform();
+		transform.setLayer(layer);
 		for (GameObject child : children) {
 			if (child.enabled) child.paint(clock);
 		}
@@ -272,19 +271,7 @@ public final class GameObject implements IUpdatable {
 		for (GameObject child : children) {
 			child.paintEditor(clock);
 		}
-		updateTransform();
-	}
-	
-	private void updateTransform() {
-		Point position = transform.position;
-//		layer.setTranslation(position.x, position.y);
-//		layer.setScaleX(scaleX);
-//		layer.setScaleY(scaleY);
-//		layer.setRotation(transform.rotation);
-		layer.transform().setTransform(1, 0, 0, 1, 0, 0);
-		layer.transform().translate(position.x, position.y);
-		layer.transform().rotate(transform.rotation);
-		layer.transform().scale(transform.scaleX, transform.scaleY);
+		transform.setLayer(layer);
 	}
 	
 	public GameObject shallowCopy() {

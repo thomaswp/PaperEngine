@@ -1,5 +1,6 @@
 package com.paperengine.core;
 
+import playn.core.GroupLayer;
 import pythagoras.f.Point;
 
 public class Transform extends Component {
@@ -51,5 +52,17 @@ public class Transform extends Component {
 					scaleX == transform.scaleX &&
 					scaleY == transform.scaleY;
 		}
+	}
+
+	public void setLayer(GroupLayer layer) {
+//		layer.setTranslation(position.x, position.y);
+//		layer.setScaleX(scaleX);
+//		layer.setScaleY(scaleY);
+//		layer.setRotation(transform.rotation);
+		layer.transform().setTransform(1, 0, 0, 1, 0, 0);
+		layer.transform().translate(position.x, position.y);
+		layer.transform().rotate(rotation);
+		layer.transform().scale(scaleX, scaleY);
+		layer.setDepth(depth);
 	}
 }

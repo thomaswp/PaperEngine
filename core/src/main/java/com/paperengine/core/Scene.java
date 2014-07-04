@@ -27,6 +27,8 @@ public class Scene implements IUpdatable, Serializable {
 	private GroupLayer layer; 
 	private int nextObjectId = 0;
 	private transient World physicsWorld;
+
+	private Camera camera;
 	
 	public Layer layer() {
 		return layer;
@@ -42,6 +44,10 @@ public class Scene implements IUpdatable, Serializable {
 	
 	public Scene() {
 		layer = graphics().createGroupLayer();
+	}
+	
+	public Camera camera() {
+		return camera;
 	}
 
 	@Override
@@ -118,10 +124,12 @@ public class Scene implements IUpdatable, Serializable {
 		if (Editor.viewingEditor) {
 			transform = EditorLayer.get().editorTransform();
 		} else {
+			camera = null;
 			for (GameObject gameObject : gameObjects) {
 				if (gameObject.enabled()) {
 					Camera camera = gameObject.camera();
 					if (camera != null && camera.isMainCamera) {
+						this.camera = camera;
 						transform = gameObject.transform();
 					}
 				}

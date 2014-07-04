@@ -12,6 +12,7 @@ import com.paperengine.core.physics.BoxCollider;
 import com.paperengine.core.physics.PhysicsBody;
 import com.paperengine.core.physics.RendererBoxCollider;
 import com.paperengine.core.physics.RendererCircleCollider;
+import com.paperengine.core.render.BackgroundRenderer;
 import com.paperengine.core.render.ImageRenderer;
 import com.paperengine.core.render.ShapeRenderer;
 import com.paperengine.core.render.ShapeRenderer.ShapeType;
@@ -71,9 +72,17 @@ public class TestScene extends Scene {
 		ground.addComponent(new RendererBoxCollider());
 		ground.transform().position.set(0, 200);
 		
+		GameObject bg = new GameObject();
+		BackgroundRenderer bgRenderer = new BackgroundRenderer();
+		bgRenderer.setImage(PlayN.assets().getImage("graphics/backgrounds/aurora.png"));
+		bgRenderer.setRepeatX(true);
+		bg.addComponent(bgRenderer);
+		bg.transform().depth = -10;
+		
 		addGameObject(camera);
 		addGameObject(obj);
 		addGameObject(fireball);
 		addGameObject(ground);
+		addGameObject(bg);
 	}
 }
