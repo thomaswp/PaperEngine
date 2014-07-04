@@ -11,6 +11,7 @@ import com.paperengine.core.camera.Camera;
 import com.paperengine.core.physics.BoxCollider;
 import com.paperengine.core.physics.PhysicsBody;
 import com.paperengine.core.physics.RendererBoxCollider;
+import com.paperengine.core.physics.RendererCircleCollider;
 import com.paperengine.core.render.ImageRenderer;
 import com.paperengine.core.render.ShapeRenderer;
 import com.paperengine.core.render.ShapeRenderer.ShapeType;
@@ -32,7 +33,7 @@ public class TestScene extends Scene {
 		obj.addComponent(renderer);
 //		obj.addComponent(new Circulator());
 		obj.addComponent(new PhysicsBody());
-		obj.addComponent(new RendererBoxCollider());
+		obj.addComponent(new RendererCircleCollider());
 		obj.setName("Circle");
 		
 		GameObject child = new GameObject();

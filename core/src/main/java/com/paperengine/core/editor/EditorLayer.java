@@ -33,13 +33,15 @@ import com.paperengine.core.Handler.Postable;
 import com.paperengine.core.Scene;
 import com.paperengine.core.Transform;
 import com.paperengine.core.physics.AbstractBoxCollider;
+import com.paperengine.core.physics.AbstractCircleCollider;
+import com.paperengine.core.physics.SimpleCollider;
 import com.paperengine.core.render.Renderer;
 import com.paperengine.core.render.SizedRenderer;
-import com.paperengine.core.util.EnumeratorUtils;
-import com.paperengine.core.util.EnumeratorUtils.Predicate;
 
 public class EditorLayer implements Listener, Postable {
 
+	private final int COLLIDER_FILL_COLOR = Color.argb(75, 0, 255, 0);
+	
 	private static EditorLayer instance;
 
 	private GroupLayer layer;
@@ -60,6 +62,8 @@ public class EditorLayer implements Listener, Postable {
 	private GroupLayer dragPointLayer;
 	private ImageLayer[] dragPoints;
 	private int draggingPoint = -1;
+	
+	private CanvasImage circleColliderImage;
 
 	private Scene scene;
 	
@@ -154,6 +158,11 @@ public class EditorLayer implements Listener, Postable {
 			dragPointLayer.add(pointLayer);
 			dragPoints[i] = pointLayer;
 		}
+
+		float ccRadius = 150;
+		circleColliderImage = graphics().createImage(ccRadius * 2, ccRadius * 2);
+		circleColliderImage.canvas().setFillColor(COLLIDER_FILL_COLOR);
+		circleColliderImage.canvas().fillCircle(ccRadius, ccRadius, ccRadius);
 	}
 	
 	public void registerLayer(Layer layer, Component component) {
@@ -190,13 +199,6 @@ public class EditorLayer implements Listener, Postable {
 		}
 	}
 	
-	private static Predicate<Component> isBoxPredicate = new Predicate<Component>() {
-		@Override
-		public boolean isTrue(Component item) {
-			return item instanceof AbstractBoxCollider;
-		}
-	};
-	
 	private void paintSelection(Surface surface) {
 		dragPointLayer.setVisible(false);
 		if (selectedObject != null) {
@@ -208,18 +210,38 @@ public class EditorLayer implements Listener, Postable {
 				drawLocalRect(surface, sizedRenderer.layer(), 0, 0, width, height, 
 						Color.argb(75, 0, 0, 255), Colors.BLUE, 2);
 			}
-			Iterable<AbstractBoxCollider> boxColliders = 
-					EnumeratorUtils.where(selectedObject.getComponents(), isBoxPredicate);
-			for (AbstractBoxCollider collider : boxColliders) {
-				float width = collider.width(), height = collider.height();
-				float ox = collider.originX(), oy = collider.originY();
-				drawLocalRect(surface, selectedObject.layer(), -ox, -oy, 
-						width, height, Color.argb(75, 0, 255, 0), Colors.GREEN, 2);
+			for (Component component : selectedObject.getComponents()) {
+				if (component instanceof SimpleCollider) {
+					SimpleCollider collider = (SimpleCollider) component;
+					float width = collider.width(), height = collider.height();
+					float ox = collider.originX(), oy = collider.originY();
+					if (collider instanceof AbstractCircleCollider) {
+						float r2 = Math.min(width, height);
+						float offX = (width - r2) / 2;
+						float offY = (height - r2) / 2;
+						drawLocalImage(surface, selectedObject.layer(), -ox + offX, -oy + offY, 
+								r2, r2, circleColliderImage);
+					} else if (collider instanceof AbstractBoxCollider) {
+						drawLocalRect(surface, selectedObject.layer(), -ox, -oy, 
+								width, height, COLLIDER_FILL_COLOR, Colors.GREEN, 2);
+					}
+				}
 			}
 		}
 	}
+	
+	private void drawLocalImage(Surface surface, Layer layer, float left, float top, 
+			float width, float height, Image image) {
+		surface.save();
+		getFullTransform(layer, tempTransform);
+		surface.transform(tempTransform.m00, tempTransform.m01, tempTransform.m10, 
+				tempTransform.m11, tempTransform.tx, tempTransform.ty);
+		surface.drawImage(image, left, top, width, height);
+		surface.restore();
+	}
 
-	private void drawLocalRect(Surface surface, Layer layer, float left, float top, float width, float height, int fillColor, int lineColor, float lineWidth) {
+	private void drawLocalRect(Surface surface, Layer layer, float left, float top, float width, float height, 
+			int fillColor, int lineColor, float lineWidth) {
 		surface.save();
 		getFullTransform(layer, tempTransform);
 		surface.transform(tempTransform.m00, tempTransform.m01, tempTransform.m10, 
@@ -293,7 +315,7 @@ public class EditorLayer implements Listener, Postable {
 	
 	@Override
 	public void onMouseDown(ButtonEvent event) {
-		if (!Editor.updateEditor()) return;
+		if (!Editor.drawEditor()) return;
 		
 		if (getLayerHit(arrowX, event) == arrowX) {
 			startDragSelected(event, true, false);
@@ -359,12 +381,12 @@ public class EditorLayer implements Listener, Postable {
 		draggingCamera = false;
 		draggingX = false; draggingY = false;
 		draggingPoint = -1;
-		if (!Editor.updateEditor()) return;
+		if (!Editor.drawEditor()) return;
 	}
 
 	@Override
 	public void onMouseMove(MotionEvent event) {
-		if (!Editor.updateEditor()) return;
+		if (!Editor.drawEditor()) return;
 		if (draggingCamera) {
 			editorTransform.position.x -= event.dx() / editorTransform.scaleX;
 			editorTransform.position.y -= event.dy() / editorTransform.scaleY;
@@ -443,7 +465,7 @@ public class EditorLayer implements Listener, Postable {
 
 	@Override
 	public void onMouseWheelScroll(WheelEvent event) {
-		if (!Editor.updateEditor()) return;
+		if (!Editor.drawEditor()) return;
 		Point mouse = mouseToGame(event.x(), event.y());
 		editorTransform.scaleX *= Math.pow(1.1, -event.velocity());
 		editorTransform.scaleY = editorTransform.scaleX;

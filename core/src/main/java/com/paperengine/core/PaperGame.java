@@ -69,7 +69,7 @@ public class PaperGame extends Game.Default {
 		}
 		clock.update(delta);
 		if (scene != null) {
-			if (Editor.updateEditor()) {
+			if (Editor.drawEditor()) {
 				scene.updateEditor(delta);
 				editorLayer.update(delta);
 			}
@@ -80,10 +80,10 @@ public class PaperGame extends Game.Default {
 	@Override
 	public void paint(float alpha) {
 		clock.paint(alpha);
-		editorLayer.layer().setVisible(Editor.updateEditor());
+		editorLayer.layer().setVisible(Editor.drawEditor());
 		backgroundLayer.setVisible(Editor.viewingEditor);
 		if (scene != null) {
-			if (Editor.updateEditor()) {
+			if (Editor.drawEditor()) {
 				scene.paintEditor(clock);
 				editorLayer.paint(clock);
 			}

@@ -6,9 +6,9 @@ public class Editor {
 	public static boolean paused;
 	public static boolean viewingEditor;
 	
-	public static boolean updateEditor() {
+	public static boolean drawEditor() {
 //		return viewingEditor;
-		return !playing || paused;
+		return !playing || paused || viewingEditor;
 	}
 	
 	public static boolean updateGame() {
