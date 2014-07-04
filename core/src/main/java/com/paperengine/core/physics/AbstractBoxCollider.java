@@ -42,9 +42,9 @@ public abstract class AbstractBoxCollider extends Collider {
 		PolygonShape shape = new PolygonShape();
 		float dw = width() * transform.scaleX * Scene.PHYSICS_SCALE / 2;
 		float dh = height() * transform.scaleY * Scene.PHYSICS_SCALE / 2;
-		Vec2 origin = new Vec2(-originX() * transform.scaleX * Scene.PHYSICS_SCALE  + dw, 
+		Vec2 center = new Vec2(-originX() * transform.scaleX * Scene.PHYSICS_SCALE  + dw, 
 				-originY() * transform.scaleY * Scene.PHYSICS_SCALE + dh);
-		shape.setAsBox(dw, dh, origin, 0);
+		shape.setAsBox(dw, dh, center, 0);
 		lastSize.set(width() * transform.scaleX, height() * transform.scaleY);
 		lastOrigin.set(originX(), originY());
 		return shape;

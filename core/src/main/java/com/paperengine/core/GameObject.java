@@ -277,10 +277,14 @@ public final class GameObject implements IUpdatable {
 	
 	private void updateTransform() {
 		Point position = transform.position;
-		layer.setTranslation(position.x, position.y);
-		layer.setRotation(transform.rotation);
-		layer.setScaleX(transform.scaleX);
-		layer.setScaleY(transform.scaleY);
+//		layer.setTranslation(position.x, position.y);
+//		layer.setScaleX(scaleX);
+//		layer.setScaleY(scaleY);
+//		layer.setRotation(transform.rotation);
+		layer.transform().setTransform(1, 0, 0, 1, 0, 0);
+		layer.transform().translate(position.x, position.y);
+		layer.transform().rotate(transform.rotation);
+		layer.transform().scale(transform.scaleX, transform.scaleY);
 	}
 	
 	public GameObject shallowCopy() {
