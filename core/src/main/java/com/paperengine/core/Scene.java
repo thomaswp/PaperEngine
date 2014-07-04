@@ -46,7 +46,7 @@ public class Scene implements IUpdatable, Serializable {
 
 	@Override
 	public void init() {
-		physicsWorld = new World(new Vec2(0, 10));
+		if (physicsWorld == null) physicsWorld = new World(new Vec2(0, 10));
 		for (GameObject object : gameObjects) {
 			object.init();
 		}

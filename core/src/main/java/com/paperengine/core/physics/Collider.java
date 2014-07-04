@@ -27,7 +27,7 @@ public abstract class Collider extends Component {
 		if (body == null) return;
 		
 		if (fixture != null) {
-//			body.destroyFixture(fixture);
+			body.destroyFixture(fixture);
 		}
 		
 		Shape shape = createShape();

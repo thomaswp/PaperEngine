@@ -15,7 +15,7 @@ import com.paperengine.core.Transform.Data;
 
 public class PhysicsBody extends Component {
 
-	public float angularDampening, linearDampening, gravityScale = 1;
+	public float angularDamping, linearDamping, gravityScale = 1;
 	public boolean fixedRotation, bullet;
 	public BodyType bodyType = BodyType.DYNAMIC;
 
@@ -38,19 +38,59 @@ public class PhysicsBody extends Component {
 		if (body == null) return;
 		Transform transform = gameObject().transform();
 		if (!lastTransform.equals(transform)) {
-			body.setTransform(new Vec2(
-					transform.position.x * Scene.PHYSICS_SCALE, 
-					transform.position.y * Scene.PHYSICS_SCALE), 
-					transform.rotation);
-			body.setAwake(true);
+			updateBodyTransform();
 		} else {
 			transform.position.x = body.getPosition().x / Scene.PHYSICS_SCALE;
 			transform.position.y = body.getPosition().y / Scene.PHYSICS_SCALE;
 			transform.rotation = body.getAngle();
+			lastTransform.set(transform);
 		}
-		lastTransform.set(transform);
+	}
+	
+	@Override
+	public void update(float delta) {
+		super.update(delta);
+		updateBodyDef();
 	}
 
+	protected void updateBodyDef() {
+		boolean update = false;
+		if (body.m_angularDamping != angularDamping) {
+			body.setAngularDamping(angularDamping);
+			update = true;
+		}
+		if (body.isBullet() != bullet) {
+			body.setBullet(bullet);
+			update = true;
+		}
+		if (body.isFixedRotation() != fixedRotation) {
+			body.setFixedRotation(fixedRotation);
+			update = true;
+		}
+		if (body.m_gravityScale != gravityScale) {
+			body.setGravityScale(gravityScale);
+			update = true;
+		}
+		if (body.m_linearDamping != linearDamping) {
+			body.setLinearDamping(linearDamping);
+			update = true;
+		}
+		if (body.getType() != bodyType) {
+			body.setType(bodyType);
+			update = true;
+		}
+		if (update) body.setAwake(true);
+	}
+	
+	protected void updateBodyTransform() { 
+		Transform transform = gameObject().transform();
+		body.setTransform(new Vec2(
+				transform.position.x * Scene.PHYSICS_SCALE, 
+				transform.position.y * Scene.PHYSICS_SCALE), 
+				transform.rotation);
+		body.setAwake(true);	
+		lastTransform.set(transform);
+	}
 	
 	private void createBody() {
 		if (gameObject().parent() != null) {
@@ -58,25 +98,13 @@ public class PhysicsBody extends Component {
 			return;
 		}
 		
-		if (body != null) {
-//			scene().physicsWorld().destroyBody(body);
+		if (body == null) {
+			body = scene().physicsWorld().createBody(new BodyDef());
+			body.setUserData(this);
 		}
 		
-		BodyDef def = new BodyDef();
-		def.angularDamping = angularDampening;
-		def.bullet = bullet;
-		def.fixedRotation = fixedRotation;
-		def.gravityScale = gravityScale;
-		def.linearDamping = linearDampening;
-		def.type = bodyType;
-		def.userData = this;
-
-		Transform transform = gameObject().transform();		
-		def.position.x = transform.position.x * Scene.PHYSICS_SCALE;
-		def.position.y = transform.position.y * Scene.PHYSICS_SCALE;
-		def.angle = transform.rotation;
+		updateBodyDef();
+		updateBodyTransform();
 		
-		body = scene().physicsWorld().createBody(def);
-		lastTransform.set(transform);
 	}
 }
