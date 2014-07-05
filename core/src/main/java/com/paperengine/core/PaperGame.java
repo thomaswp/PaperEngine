@@ -1,7 +1,6 @@
 package com.paperengine.core;
 
-import static playn.core.PlayN.graphics;
-import static playn.core.PlayN.mouse;
+import static playn.core.PlayN.*;
 import playn.core.Game;
 import playn.core.ImmediateLayer;
 import playn.core.ImmediateLayer.Renderer;
@@ -45,7 +44,7 @@ public class PaperGame extends Game.Default {
 	}
 
 	@Override
-	public void init() {
+	public void init() {		
 		clock = new Clock.Source(16);
 		editorLayer = new EditorLayer();
 		backgroundLayer = graphics().createImmediateLayer(new Renderer() {
@@ -80,8 +79,6 @@ public class PaperGame extends Game.Default {
 	@Override
 	public void paint(float alpha) {
 		clock.paint(alpha);
-		editorLayer.layer().setVisible(Editor.drawEditor());
-		backgroundLayer.setVisible(Editor.viewingEditor);
 		if (scene != null) {
 			if (Editor.drawEditor()) {
 				scene.paintEditor(clock);
@@ -89,5 +86,7 @@ public class PaperGame extends Game.Default {
 			}
 			if (Editor.updateGame()) scene.paint(clock);
 		}
+		editorLayer.layer().setVisible(Editor.drawEditor());
+		backgroundLayer.setVisible(Editor.viewingEditor);
 	}
 }

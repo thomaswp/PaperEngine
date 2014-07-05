@@ -342,13 +342,15 @@ public class EditorLayer implements Listener, Postable {
 			Component selected = layerMap.get(hit);
 			if (selected == null) {
 				log().warn("Unregistered Layer: " + hit);
-			} else {
+			} else  {
 				selectedObject = selected.gameObject();
 				if (selectedListener != null) {
 					selectedListener.onSelected(selectedObject);
 				}
-				startDragSelected(event, true, true);
-				return;
+				if (selected.draggableInEditor()) {
+					startDragSelected(event, true, true);
+					return;
+				}
 			}
 		}
 		

@@ -60,29 +60,61 @@ public class TestScene extends Scene {
 		collider.originX = 16; collider.originY = 16;
 		fireball.addComponent(collider);
 		
-		GameObject ground = new GameObject();
-		ground.setName("Ground");
+		GameObject platform = new GameObject();
+		platform.setName("Ground");
 		renderer = new ShapeRenderer();
 		renderer.set(ShapeType.Rectangle, 1000, 50, Colors.GRAY, Colors.DARK_GRAY, 2, 0);
 		renderer.setCentered(true);
-		ground.addComponent(renderer);
+		platform.addComponent(renderer);
 		PhysicsBody body = new PhysicsBody();
 		body.bodyType = BodyType.STATIC;
-		ground.addComponent(body);
-		ground.addComponent(new RendererBoxCollider());
-		ground.transform().position.set(0, 200);
+		platform.addComponent(body);
+		platform.addComponent(new RendererBoxCollider());
+		platform.transform().position.set(0, 200);
 		
-		GameObject bg = new GameObject();
+		GameObject background = new GameObject();
+		background.setName("Background");
+		background.transform().depth = -10;
+		background.transform().position.y = 45;
+		
+		GameObject sky = new GameObject();
+		sky.setName("Sky");
 		BackgroundRenderer bgRenderer = new BackgroundRenderer();
-		bgRenderer.setImage(PlayN.assets().getImage("graphics/backgrounds/aurora.png"));
-		bgRenderer.setRepeatX(true);
-		bg.addComponent(bgRenderer);
-		bg.transform().depth = -10;
+		bgRenderer.setImage(PlayN.assets().getImage("graphics/backgrounds/sky.png"));
+		bgRenderer.repeatLeft = bgRenderer.repeatRight = bgRenderer.repeatUp = true;
+		sky.addComponent(bgRenderer);
+		background.addChild(sky);
+		
+		GameObject ground = new GameObject();
+		ground.setName("Ground");
+		bgRenderer = new BackgroundRenderer();
+		bgRenderer.setImage(PlayN.assets().getImage("graphics/foregrounds/ground.png"));
+		bgRenderer.repeatLeft = bgRenderer.repeatRight = true;
+		ground.addComponent(bgRenderer);
+		background.addChild(ground);
+		
+		GameObject mountains = new GameObject();
+		mountains.setName("Mountains");
+		mountains.transform().position.y = -256;
+		bgRenderer = new BackgroundRenderer();
+		bgRenderer.setImage(PlayN.assets().getImage("graphics/midgrounds/mountain.png"));
+		bgRenderer.repeatLeft = bgRenderer.repeatRight = true;
+		mountains.addComponent(bgRenderer);
+		background.addChild(mountains);
+		
+		GameObject trees = new GameObject();
+		trees.setName("Trees");
+		trees.transform().position.y = -195;
+		bgRenderer = new BackgroundRenderer();
+		bgRenderer.setImage(PlayN.assets().getImage("graphics/midgrounds/trees.png"));
+		bgRenderer.repeatLeft = bgRenderer.repeatRight = true;
+		trees.addComponent(bgRenderer);
+		background.addChild(trees);
 		
 		addGameObject(camera);
 		addGameObject(obj);
 		addGameObject(fireball);
-		addGameObject(ground);
-		addGameObject(bg);
+		addGameObject(platform);
+		addGameObject(background);
 	}
 }

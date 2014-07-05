@@ -14,7 +14,7 @@
   <name>DemoGame Metaproject</name>
 
   <properties>
-    <playn.version>1.8</playn.version>
+    <playn.version>1.8.5</playn.version>
   </properties>
 
   <profiles>

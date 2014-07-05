@@ -41,4 +41,8 @@ public abstract class Component implements IUpdatable, Postable, Comparable<Comp
 	public int compareTo(Component o) {
 		return 0;
 	}
+
+	public boolean draggableInEditor() {
+		return true;
+	}
 }
