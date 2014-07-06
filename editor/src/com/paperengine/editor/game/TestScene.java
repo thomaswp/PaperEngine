@@ -8,6 +8,7 @@ import tripleplay.util.Colors;
 import com.paperengine.core.GameObject;
 import com.paperengine.core.Scene;
 import com.paperengine.core.camera.Camera;
+import com.paperengine.core.camera.Parallax;
 import com.paperengine.core.physics.BoxCollider;
 import com.paperengine.core.physics.PhysicsBody;
 import com.paperengine.core.physics.RendererBoxCollider;
@@ -100,11 +101,15 @@ public class TestScene extends Scene {
 		bgRenderer.setImage(PlayN.assets().getImage("graphics/midgrounds/mountain.png"));
 		bgRenderer.repeatLeft = bgRenderer.repeatRight = true;
 		mountains.addComponent(bgRenderer);
+		Parallax parallax = new Parallax();
+		parallax.moveYFactor = 0.9f;
+		parallax.moveXFactor = 0.5f;
+		mountains.addComponent(parallax);
 		background.addChild(mountains);
 		
 		GameObject trees = new GameObject();
 		trees.setName("Trees");
-		trees.transform().position.y = -195;
+		trees.transform().position.y = -210;
 		bgRenderer = new BackgroundRenderer();
 		bgRenderer.setImage(PlayN.assets().getImage("graphics/midgrounds/trees.png"));
 		bgRenderer.repeatLeft = bgRenderer.repeatRight = true;
