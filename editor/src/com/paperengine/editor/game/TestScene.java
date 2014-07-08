@@ -27,6 +27,7 @@ public class TestScene extends Scene {
 		camera.addComponent(new Camera());
 		camera.camera().isMainCamera = true;
 		camera.setName("Camera");
+//		camera.addComponent(new Circulator());
 		
 		GameObject obj = new GameObject();
 		ShapeRenderer renderer = new ShapeRenderer();

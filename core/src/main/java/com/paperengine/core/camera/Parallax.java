@@ -24,20 +24,14 @@ public class Parallax extends Component {
 		super.paint(clock);
 		Point currentPos = gameObject().transform().position; 
 		if (!currentPos.equals(lastPosition)) {
-			
+			startPosition.subtractLocal(lastPosition.x - currentPos.x, lastPosition.y - currentPos.y);
 		}
 		
 		currentPos.set(0, 0);
-		Layer.Util.screenToLayer(gameObject().layer(), currentPos, currentPos);
+		Layer.Util.screenToLayer(gameObject().layer().parent(), currentPos, currentPos);
 		currentPos.x = (currentPos.x - startPosition.x) * (1 - moveXFactor) + startPosition.x;
 		currentPos.y = (currentPos.y - startPosition.y) * (1 - moveYFactor) + startPosition.y;
 		
 		lastPosition.set(currentPos);
-	}
-	
-	@Override
-	public void paintEditor(Clock clock) {
-		super.paintEditor(clock);
-		paint(clock);
 	}
 }
